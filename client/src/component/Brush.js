@@ -6,27 +6,38 @@ class Brush extends Component {
     super(props)
     var {height, width, domainX, startDate, endDate} = this.props
     this.brushRef = {}
-
     this.x = d3.scaleTime().range([0, width]).domain(domainX)
-
     this.brush = d3.brushX()
         .extent([[0, 0], [width, height]])
-        .on("brush end", () => console.log(d3.event.selection.map( xN => this.x.invert(xN))))
+        .on("end", this.brushed.bind(this))
 
-    this.state = {startX: this.x(startDate), endX: this.x(endDate)}
+  }
+
+  brushed() {
+  //  console.log(this.brush.extent() ,d3.event.selection, d3.event.selection.map( xN => this.x.invert(Number(xN))))
   }
 
   shouldComponentUpdate() {
     return false
   }
 
+  componentWillReceiveProps(nextProps) {
+    var startX = Math.round(this.x(nextProps.startDate))
+    var endX = Math.round(this.x(nextProps.endDate))
+    var gBrush = d3.select(this.brushRef)
+    gBrush
+      .call(this.brush.move, [startX, endX])
+  }
+
   componentDidMount() {
-    console.log(this.state)
-    var {startX, endX} = this.state
+    var {startDate, endDate} = this.props
+    var startX = startDate ? this.x(startDate) : 0
+    var endX = endDate ? this.x(endDate) : this.props.width
+
     var gBrush = d3.select(this.brushRef)
     gBrush
       .call(this.brush)
-      .call(this.brush.move, [Math.round(startX), Math.round(endX)])
+      .call(this.brush.move, [startX, endX])
   }
 
   render() {
