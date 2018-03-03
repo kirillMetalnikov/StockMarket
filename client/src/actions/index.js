@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import {ADD_STOCK} from '../const.js'
+import {ADD_STOCK, SET_DISPLAY_PERIOD} from '../const.js'
 
 
 export const getStock = (code, from, to) => dispatch => {
@@ -10,4 +10,8 @@ export const getStock = (code, from, to) => dispatch => {
     } )
     dispatch({type: ADD_STOCK, stock: res.data, code})
   })
+}
+
+export const setDisplayPeriod = (from, to) => dispatch => {
+  dispatch({type: SET_DISPLAY_PERIOD, from, to})
 }

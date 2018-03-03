@@ -1,1 +1,2 @@
 export const ADD_STOCK = 'GET_STOCK'
+export const SET_DISPLAY_PERIOD = 'SET_DISPLAY_PERIOD'
