@@ -28257,6 +28257,11 @@ var Chart = function (_Component) {
       return d3.timeParse("%Y-%m-%d")(date);
     }
   }, {
+    key: 'changeArea',
+    value: function changeArea(startDate, endDate) {
+      this.setState({ startDate: startDate, endDate: endDate });
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _props = this.props,
@@ -28273,7 +28278,7 @@ var Chart = function (_Component) {
       return _react2.default.createElement(
         'svg',
         { width: width, height: height },
-        _react2.default.createElement(_LineChart2.default, { width: width, height: height - 100, domainX: [this.parseTime('2017-10-09'), this.parseTime('2018-03-02')], domainY: [0, 100], data: arr }),
+        _react2.default.createElement(_LineChart2.default, { width: width, height: height - 100, domainX: [this.state.startDate, this.state.endDate], domainY: [0, 100], data: arr }),
         _react2.default.createElement(
           'g',
           { transform: 'translate(0, ' + (height - 70) + ')' },
@@ -28282,8 +28287,9 @@ var Chart = function (_Component) {
             width: width,
             height: 50,
             domainX: [this.parseTime('2017-10-09'), this.parseTime('2018-03-02')],
-            startDate: this.state.startDate,
-            endDate: this.state.endDate
+            startDate: this.parseTime('2017-10-09'),
+            endDate: this.parseTime('2018-03-02'),
+            onChangeArea: this.changeArea.bind(this)
           })
         )
       );
@@ -41444,7 +41450,13 @@ var Brush = function (_Component) {
   _createClass(Brush, [{
     key: 'brushed',
     value: function brushed() {
+      var _this2 = this;
+
       //  console.log(this.brush.extent() ,d3.event.selection, d3.event.selection.map( xN => this.x.invert(Number(xN))))
+      var area = d3.event.selection.map(function (xN) {
+        return _this2.x.invert(Number(xN));
+      });
+      this.props.onChangeArea(area[0], area[1]);
     }
   }, {
     key: 'shouldComponentUpdate',
@@ -41454,8 +41466,13 @@ var Brush = function (_Component) {
   }, {
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
-      var startX = Math.round(this.x(nextProps.startDate));
-      var endX = Math.round(this.x(nextProps.endDate));
+      var startDate = nextProps.startDate,
+          endDate = nextProps.endDate;
+
+      if (startDate.valueOf() == this.props.startDate.valueOf() && endDate.valueOf() == this.props.endDate.valueOf()) return;
+
+      var startX = Math.round(this.x(startDate));
+      var endX = Math.round(this.x(endDate));
       var gBrush = d3.select(this.brushRef);
       gBrush.call(this.brush.move, [startX, endX]);
     }
@@ -41475,10 +41492,10 @@ var Brush = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
+      var _this3 = this;
 
       return _react2.default.createElement('g', { className: 'brush', ref: function ref(_ref) {
-          return _this2.brushRef = _ref;
+          return _this3.brushRef = _ref;
         } });
     }
   }]);
@@ -42549,31 +42566,30 @@ var LineChart = function (_Component) {
   function LineChart(props) {
     _classCallCheck(this, LineChart);
 
-    var _this = _possibleConstructorReturn(this, (LineChart.__proto__ || Object.getPrototypeOf(LineChart)).call(this, props));
-
-    var _this$props = _this.props,
-        width = _this$props.width,
-        height = _this$props.height,
-        data = _this$props.data,
-        domainX = _this$props.domainX,
-        domainY = _this$props.domainY;
-
-
-    var x = d3.scaleTime().rangeRound([0, width]).domain(domainX);
-    var y = d3.scaleLinear().rangeRound([height, 0]).domain(domainY);
-
-    var line = d3.line().x(function (d) {
-      return x(d.date);
-    }).y(function (d) {
-      return y(+d.close);
-    });
-    _this.path = line(data);
-    return _this;
+    return _possibleConstructorReturn(this, (LineChart.__proto__ || Object.getPrototypeOf(LineChart)).call(this, props));
   }
 
   _createClass(LineChart, [{
     key: 'render',
     value: function render() {
+      var _props = this.props,
+          width = _props.width,
+          height = _props.height,
+          data = _props.data,
+          domainX = _props.domainX,
+          domainY = _props.domainY;
+
+
+      var x = d3.scaleTime().rangeRound([0, width]).domain(domainX);
+      var y = d3.scaleLinear().rangeRound([height, 0]).domain(domainY);
+
+      var line = d3.line().x(function (d) {
+        return x(d.date);
+      }).y(function (d) {
+        return y(+d.close);
+      });
+      this.path = line(data);
+
       return _react2.default.createElement('path', { d: this.path, stroke: 'blue', fill: 'none' });
     }
   }]);

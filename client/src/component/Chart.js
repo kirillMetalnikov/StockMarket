@@ -16,6 +16,10 @@ class Chart extends Component {
     return d3.timeParse("%Y-%m-%d")(date)
   }
 
+  changeArea(startDate, endDate) {
+    this.setState({startDate, endDate})
+  }
+
   render() {
     var { width, height} = this.props
 //    var parseTime = d3.timeParse("%Y-%m-%d")
@@ -28,15 +32,16 @@ class Chart extends Component {
 
     return (
       <svg width = {width} height = {height}>
-        <LineChart width = {width} height={height - 100} domainX = {[this.parseTime('2017-10-09'), this.parseTime('2018-03-02')]} domainY = {[0, 100]} data = {arr}/>
+        <LineChart width = {width} height={height - 100} domainX = {[this.state.startDate, this.state.endDate]} domainY = {[0, 100]} data = {arr}/>
         <g transform = {`translate(0, ${height - 70})`}>
           <LineChart width = {width} height={50} domainX = {[this.parseTime('2017-10-09'), this.parseTime('2018-03-02')]} domainY = {[0, 100]} data = {arr}/>
           <Brush
             width = {width}
             height={50}
             domainX = {[this.parseTime('2017-10-09'), this.parseTime('2018-03-02')]}
-            startDate = {this.state.startDate}
-            endDate = {this.state.endDate}
+            startDate = {this.parseTime('2017-10-09')}
+            endDate = {this.parseTime('2018-03-02')}
+            onChangeArea = {this.changeArea.bind(this)}
           />
         </g>
       </svg>

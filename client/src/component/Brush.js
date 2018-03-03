@@ -14,7 +14,9 @@ class Brush extends Component {
   }
 
   brushed() {
-  //  console.log(this.brush.extent() ,d3.event.selection, d3.event.selection.map( xN => this.x.invert(Number(xN))))
+    //  console.log(this.brush.extent() ,d3.event.selection, d3.event.selection.map( xN => this.x.invert(Number(xN))))
+    var area = d3.event.selection.map( xN => this.x.invert(Number(xN)))
+    this.props.onChangeArea(area[0], area[1])
   }
 
   shouldComponentUpdate() {
@@ -22,8 +24,11 @@ class Brush extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    var startX = Math.round(this.x(nextProps.startDate))
-    var endX = Math.round(this.x(nextProps.endDate))
+    var {startDate, endDate} = nextProps
+    if (startDate.valueOf() == this.props.startDate.valueOf() && endDate.valueOf() == this.props.endDate.valueOf()) return
+
+    var startX = Math.round(this.x(startDate))
+    var endX = Math.round(this.x(endDate))
     var gBrush = d3.select(this.brushRef)
     gBrush
       .call(this.brush.move, [startX, endX])
