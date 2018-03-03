@@ -4,7 +4,7 @@ import * as d3 from 'd3'
 class Brush extends Component {
   constructor(props) {
     super(props)
-    var {height, width, domainX, startDate, endDate} = this.props
+    var {height, width, domainX, brushFrom, brushTo} = this.props
     this.brushRef = {}
     this.x = d3.scaleTime().range([0, width]).domain(domainX)
     this.brush = d3.brushX()
@@ -24,20 +24,20 @@ class Brush extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    var {startDate, endDate} = nextProps
-    if (startDate.valueOf() == this.props.startDate.valueOf() && endDate.valueOf() == this.props.endDate.valueOf()) return
+    var {brushFrom, brushTo} = nextProps
+    if (brushFrom.valueOf() == this.props.brushFrom.valueOf() && brushTo.valueOf() == this.props.brushTo.valueOf()) return
 
-    var startX = Math.round(this.x(startDate))
-    var endX = Math.round(this.x(endDate))
+    var startX = this.x(brushFrom)
+    var endX = this.x(brushTo)
     var gBrush = d3.select(this.brushRef)
     gBrush
       .call(this.brush.move, [startX, endX])
   }
 
   componentDidMount() {
-    var {startDate, endDate} = this.props
-    var startX = startDate ? this.x(startDate) : 0
-    var endX = endDate ? this.x(endDate) : this.props.width
+    var {brushFrom, brushTo} = this.props
+    var startX = this.x(brushFrom)
+    var endX = this.x(brushTo)
 
     var gBrush = d3.select(this.brushRef)
     gBrush

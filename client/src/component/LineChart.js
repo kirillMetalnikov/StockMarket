@@ -8,7 +8,7 @@ class LineChart extends Component {
   }
 
   render() {
-    var {width, height, data, domainX, domainY} = this.props
+    var {width, height, data, domainX, domainY, color} = this.props
 
     var x = d3.scaleTime()
       .rangeRound([0, width])
@@ -20,10 +20,10 @@ class LineChart extends Component {
     var line = d3.line()
         .x(d => x(d.date))
         .y(d => y(+d.close))
-    this.path = line(data)
-    
+    this.path = line(data ? data.stock : [])
+
     return (
-      <path d = {this.path} stroke = 'blue' fill = 'none'/>
+      <path d = {this.path} stroke = {color} fill = 'none'/>
     )
   }
 }
