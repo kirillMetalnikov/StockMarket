@@ -6,7 +6,7 @@ class Brush extends Component {
     super(props)
     var {height, width, domainX, brushFrom, brushTo} = this.props
     this.brushRef = {}
-    this.x = d3.scaleTime().range([0, width]).domain(domainX)
+    this.x = d3.scaleTime().range([0, width])
     this.brush = d3.brushX()
         .extent([[0, 0], [width, height]])
         .on("end", this.brushed.bind(this))
@@ -24,8 +24,10 @@ class Brush extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    var {brushFrom, brushTo} = nextProps
+    var {brushFrom, brushTo, domainX} = nextProps
     if (brushFrom.valueOf() == this.props.brushFrom.valueOf() && brushTo.valueOf() == this.props.brushTo.valueOf()) return
+
+    this.x.domain(domainX)
 
     var startX = this.x(brushFrom)
     var endX = this.x(brushTo)

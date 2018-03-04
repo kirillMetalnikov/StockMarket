@@ -1,6 +1,6 @@
 import {combineReducers} from 'redux'
 
-import {ADD_STOCK, SET_DISPLAY_PERIOD} from '../const.js'
+import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD} from '../const.js'
 
 function stocks(state = [], action) {
   switch (action.type) {
@@ -21,18 +21,31 @@ function from (state = fromDate, action) {
   }
 }
 
-
-function displayPeriod (state = {from: fromDate, to: new Date()}, action) {
+function to (state = new Date(), action) {
   switch (action.type) {
-    case SET_DISPLAY_PERIOD:
-      return {from: action.from, to: action.to}
     default:
       return state
   }
 }
 
-function to (state = new Date(), action) {
+function stockPeriod (state = {from: fromDate, to: new Date()}, action) {
   switch (action.type) {
+    case SET_STOCK_PERIOD:
+      var {from, to} = action
+      return {from, to}
+    default:
+      return state
+  }
+}
+
+function displayPeriod (state = {from: fromDate, to: new Date()}, action) {
+  switch (action.type) {
+    case SET_DISPLAY_PERIOD:
+      var {from, to} = action
+      return {from, to}
+    case SET_STOCK_PERIOD:
+      var {from, to} = action
+      return {from, to}
     default:
       return state
   }
@@ -48,5 +61,6 @@ export default combineReducers({
   stocks,
   from,
   to,
-  displayPeriod
+  displayPeriod,
+  stockPeriod
 })

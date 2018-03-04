@@ -1,8 +1,29 @@
 var express = require('express')
-var yahooFinance = require('yahoo-finance');
-
 var app = express()
+var http = require('http').Server(app)
+var io = require('socket.io')(http)
+
+var yahooFinance = require('yahoo-finance')
+
 var path = process.cwd()
+var stocksList = ['fb', 'nflx']
+
+const getStock = (symbol, from, to) => {
+  return new Promise ( (resolve, reject) => {
+    yahooFinance.historical({
+      symbol,
+      from, //'2015-01-01'
+      to, //'2015-01-01'
+      }, (err, quotes) => {
+        if (err) reject(err)
+        quotes = quotes.map(quote => {
+          var {date, close} = quote
+          return {date, close}
+        } )
+        resolve(quotes)
+      })
+  })
+}
 
 app.use('/client', express.static(path + '/client'))
 app.use('/public', express.static(path + '/client/public'))
@@ -29,7 +50,41 @@ app.route('/api/getStock/:code/:from/:to')
     });
   })
 
+io.on('connection', function(socket){
+//  console.log('a user connected')
+  var from = new Date()
+  var to = new Date()
+  from.setFullYear(from.getFullYear() - 1)
+  to.setDate(to.getDate() - 1)
+
+  socket.emit('stock period', {from, to})
+
+  stocksList.forEach( code => {
+    getStock(code, from, to)
+      .then( stock => {
+        socket.emit('add stock', {stock, code})
+      })
+      .catch( err => console.log(err))
+  })
+/*
+  socket.on('disconnect', () => {
+    console.log('user disconnected')
+  })
+*/
+  socket.on('get stock', ({code})=> {
+    if (stocksList.indexOf(code) == -1) {
+      getStock(code, from, to)
+        .then( stock => {
+          stocksList.push(code)
+          socket.emit('add stock', {stock, code})
+          socket.broadcast.emit('add stock', {stock, code})
+        })
+        .catch( err => console.log(err))
+    }
+  })
+})
+
 var port = process.env.PORT || 8080
-app.listen(port, () => {
+http.listen(port, () => {
   console.log(`Node.js is listening on port ${port}`)
 })
