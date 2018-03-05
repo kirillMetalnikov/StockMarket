@@ -10,7 +10,7 @@ class AxisDate extends Component {
     this.axis = d3.axisBottom(this.x)
       .tickFormat(d3.timeFormat("%b %d"))
       .ticks(5)
-      .tickSize(50)
+      .tickSize(30)
   }
 
   shouldComponentUpdate() {
@@ -18,8 +18,14 @@ class AxisDate extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    var {domain} = nextProps
-    if (domain.valueOf() == this.props.domain.valueOf() && range.valueOf() == this.props.brange.valueOf()) return
+    var {domain, range} = nextProps
+  //  if (domain.valueOf() == this.props.domain.valueOf() && range.valueOf() == this.props.brange.valueOf()) return
+    if (range[1] != this.props.range[1]) { // width
+      this.x = this.x.range(range)
+      this.axis = d3.axisBottom(this.x)
+        .tickFormat(d3.timeFormat("%b %d"))
+        .ticks(5)
+    }
 
     this.x.domain(domain)
 

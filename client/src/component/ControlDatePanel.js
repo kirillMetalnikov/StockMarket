@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
 import {setDisplayPeriod} from '../actions'
+import {ButtonGroup, Button} from 'react-bootstrap'
 
 class ControlDatePanel extends Component {
   constructor(props) {
@@ -22,13 +23,12 @@ class ControlDatePanel extends Component {
     fromWeek.setDate(fromWeek.getDate() - 7)
 
     return (
-      <div>
-        <h3>Control</h3>
-        <button onClick = { () => this.props.setDisplayPeriod(from, to)}>All</button>
-        <button onClick = { () => this.props.setDisplayPeriod(from6Month, to)}>6 Month</button>
-        <button onClick = { () => this.props.setDisplayPeriod(from3Month, to)}>3 Month</button>
-        <button onClick = { () => this.props.setDisplayPeriod(fromMonth, to)}>Month</button>
-      </div>
+      <ButtonGroup>
+        <Button onClick = { () => this.props.setDisplayPeriod(from, to)}>All</Button>
+        <Button onClick = { () => this.props.setDisplayPeriod(from6Month, to)}>6 Month</Button>
+        <Button onClick = { () => this.props.setDisplayPeriod(from3Month, to)}>3 Month</Button>
+        <Button onClick = { () => this.props.setDisplayPeriod(fromMonth, to)}>Month</Button>
+      </ButtonGroup>
     )
   }
 }
