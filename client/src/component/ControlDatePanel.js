@@ -28,7 +28,6 @@ class ControlDatePanel extends Component {
         <button onClick = { () => this.props.setDisplayPeriod(from6Month, to)}>6 Month</button>
         <button onClick = { () => this.props.setDisplayPeriod(from3Month, to)}>3 Month</button>
         <button onClick = { () => this.props.setDisplayPeriod(fromMonth, to)}>Month</button>
-        <button onClick = { () => this.props.setDisplayPeriod(fromWeek, to)}>Week</button>
       </div>
     )
   }

@@ -4781,23 +4781,30 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var socket = _socket2.default.connect('/');
 
 var socketListener = exports.socketListener = function socketListener(dispatch) {
-
+  var lowPrice = Infinity;
+  var maxPrice = 0;
   socket.on('add stock', function (_ref) {
     var stock = _ref.stock,
         code = _ref.code;
 
     stock.forEach(function (quote) {
       quote.date = new Date(quote.date);
+      if (quote.close > maxPrice) maxPrice = quote.close;
+      if (quote.close < lowPrice) lowPrice = quote.close;
     });
+
+    dispatch({ type: _const.SET_PRICE_DOMAIN, from: lowPrice, to: maxPrice });
+    dispatch({ type: _const.SET_STOCK_PERIOD, from: stock[stock.length - 1].date, to: stock[0].date });
     dispatch({ type: _const.ADD_STOCK, stock: stock, code: code });
   });
 
-  socket.on('stock period', function (_ref2) {
-    var from = _ref2.from,
-        to = _ref2.to;
-
-    dispatch({ type: _const.SET_STOCK_PERIOD, from: new Date(from), to: new Date(to) });
+  socket.on('message', function (mess) {
+    console.log(mess);
   });
+  /*  socket.on('stock period', ({from, to}) => {
+      dispatch({type: SET_STOCK_PERIOD, from: new Date(from), to: new Date(to)})
+    })
+    */
 };
 
 var getStock = exports.getStock = function getStock(code, from, to) {
@@ -16172,6 +16179,7 @@ Object.defineProperty(exports, "__esModule", {
 var ADD_STOCK = exports.ADD_STOCK = 'ADD_STOCK';
 var SET_DISPLAY_PERIOD = exports.SET_DISPLAY_PERIOD = 'SET_DISPLAY_PERIOD';
 var SET_STOCK_PERIOD = exports.SET_STOCK_PERIOD = 'SET_STOCK_PERIOD';
+var SET_PRICE_DOMAIN = exports.SET_PRICE_DOMAIN = 'SET_PRICE_DOMAIN';
 
 /***/ }),
 /* 233 */
@@ -35562,12 +35570,19 @@ var Chart = function (_Component) {
 
   _createClass(Chart, [{
     key: 'renderLines',
-    value: function renderLines(width, height, domainX, domainY, stocks) {
+    value: function renderLines(width, height, domainX, domainY, stocks, filtered) {
       if (!stocks) return '';
       var color = d3.schemeCategory20;
-
       return stocks.map(function (stock, index) {
-        return _react2.default.createElement(_LineChart2.default, { key: stock.code, width: width, height: height, domainX: domainX, domainY: domainY, data: stock, color: color[index] });
+        var data = stock.stock;
+        if (filtered) {
+          data = data.filter(function (_ref) {
+            var date = _ref.date;
+
+            return date.getTime() >= domainX[0].getTime() && date.getTime() <= domainX[1].getTime();
+          });
+        }
+        return _react2.default.createElement(_LineChart2.default, { key: stock.code, width: width, height: height, domainX: domainX, domainY: domainY, data: data, color: color[index] });
       });
     }
   }, {
@@ -35578,12 +35593,12 @@ var Chart = function (_Component) {
           height = _props.height,
           stocks = _props.stocks,
           displayPeriod = _props.displayPeriod,
-          stockPeriod = _props.stockPeriod;
+          stockPeriod = _props.stockPeriod,
+          priceDomain = _props.priceDomain;
 
       var margin = 50;
       width = width - 2 * margin;
       height = height - 2 * margin;
-
       return _react2.default.createElement(
         'div',
         null,
@@ -35593,17 +35608,17 @@ var Chart = function (_Component) {
           _react2.default.createElement(
             'g',
             { transform: 'translate(' + margin + ', ' + margin + ')' },
-            this.renderLines(width, height - 100, [displayPeriod.from, displayPeriod.to], [0, 2000], stocks),
+            this.renderLines(width, height - 100, [displayPeriod.from, displayPeriod.to], [priceDomain.from, priceDomain.to], stocks, true),
             _react2.default.createElement(
               'g',
               { transform: 'translate(0, ' + (height - 100) + ')' },
               _react2.default.createElement(_AxisDate2.default, { domain: [displayPeriod.from, displayPeriod.to], range: [0, width] })
             ),
-            _react2.default.createElement(_AxisPrice2.default, { domain: [0, 2000], range: [height - 100, 0] }),
+            _react2.default.createElement(_AxisPrice2.default, { domain: [priceDomain.from, priceDomain.to], range: [height - 100, 0] }),
             _react2.default.createElement(
               'g',
               { transform: 'translate(0, ' + (height - 70) + ')' },
-              this.renderLines(width, 50, [stockPeriod.from, stockPeriod.to], [0, 2000], stocks),
+              this.renderLines(width, 50, [stockPeriod.from, stockPeriod.to], [priceDomain.from, priceDomain.to], stocks, false),
               _react2.default.createElement(_Brush2.default, {
                 width: width,
                 height: 50,
@@ -48886,7 +48901,6 @@ var LineChart = function (_Component) {
           domainY = _props.domainY,
           color = _props.color;
 
-
       var x = d3.scaleTime().rangeRound([0, width]).domain(domainX);
       var y = d3.scaleLinear().range([height, 0]).domain(domainY);
 
@@ -48895,7 +48909,7 @@ var LineChart = function (_Component) {
       }).y(function (d) {
         return y(+d.close);
       });
-      this.path = line(data ? data.stock : []);
+      this.path = line(data || []);
 
       return _react2.default.createElement('path', { d: this.path, stroke: color, fill: 'none' });
     }
@@ -53881,13 +53895,6 @@ var ControlDatePanel = function (_Component) {
               return _this2.props.setDisplayPeriod(fromMonth, to);
             } },
           'Month'
-        ),
-        _react2.default.createElement(
-          'button',
-          { onClick: function onClick() {
-              return _this2.props.setDisplayPeriod(fromWeek, to);
-            } },
-          'Week'
         )
       );
     }
@@ -53926,7 +53933,13 @@ function stocks() {
 
   switch (action.type) {
     case _const.ADD_STOCK:
+      var codes = state.map(function (stock) {
+        return stock.code;
+      });
+      if (codes.indexOf(action.code) != -1) return state;
+
       return [].concat(_toConsumableArray(state), [{ code: action.code, stock: action.stock }]);
+
     default:
       return state;
   }
@@ -53979,10 +53992,28 @@ function displayTo() {
       return state;
   }
 }
+
+function priceDomain() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { from: 0, to: 0 };
+  var action = arguments[1];
+
+  switch (action.type) {
+    case _const.SET_PRICE_DOMAIN:
+      var from = state.from;
+      var to = state.to;
+      from = from == 0 ? action.from : from > action.from ? action.from : from;
+      to = to == 0 ? action.to : to < action.to ? action.to : to;
+      return { from: from, to: to };
+    default:
+      return state;
+  }
+}
+
 exports.default = (0, _redux.combineReducers)({
   stocks: stocks,
   displayPeriod: displayPeriod,
-  stockPeriod: stockPeriod
+  stockPeriod: stockPeriod,
+  priceDomain: priceDomain
 });
 
 /***/ })

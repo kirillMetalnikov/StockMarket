@@ -1,11 +1,17 @@
 import {combineReducers} from 'redux'
 
-import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD} from '../const.js'
+import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD, SET_PRICE_DOMAIN} from '../const.js'
 
 function stocks(state = [], action) {
   switch (action.type) {
     case ADD_STOCK:
+      var codes = (state.map( stock => {
+        return stock.code
+      } ))
+      if (codes.indexOf(action.code) != -1) return state
+
       return [...state, {code: action.code, stock: action.stock}]
+      
     default:
       return state
   }
@@ -43,8 +49,25 @@ function displayTo (state = new Date(), action) {
       return state
   }
 }
+
+function priceDomain (state = {from: 0, to: 0}, action) {
+  switch (action.type) {
+    case SET_PRICE_DOMAIN:
+      var from = state.from
+      var to = state.to
+      from = from == 0 ? action.from
+        : from > action.from ? action.from : from
+      to = to == 0 ? action.to
+        : to < action.to ? action.to : to
+      return {from, to}
+    default:
+      return state
+  }
+}
+
 export default combineReducers({
   stocks,
   displayPeriod,
-  stockPeriod
+  stockPeriod,
+  priceDomain
 })

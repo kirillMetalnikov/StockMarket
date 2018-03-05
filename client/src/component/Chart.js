@@ -14,33 +14,37 @@ class Chart extends Component {
     super(props)
   }
 
-  renderLines(width, height, domainX, domainY, stocks) {
+  renderLines(width, height, domainX, domainY, stocks, filtered) {
     if (!stocks) return ''
     let color = d3.schemeCategory20
-
     return stocks.map( (stock, index) => {
-      return <LineChart key = {stock.code} width = {width} height={height} domainX = {domainX} domainY = {domainY} data = {stock} color= {color[index]}/>
+      var data = stock.stock
+      if (filtered) {
+        data = data.filter( ({date}) => {
+          return date.getTime() >= domainX[0].getTime() && date.getTime() <= domainX[1].getTime()
+        })
+      }
+      return <LineChart key = {stock.code} width = {width} height={height} domainX = {domainX} domainY = {domainY} data = {data} color= {color[index]}/>
     })
   }
 
   render() {
-    var { width, height, stocks, displayPeriod, stockPeriod} = this.props
+    var { width, height, stocks, displayPeriod, stockPeriod, priceDomain} = this.props
     var margin = 50
     width = width - 2 * margin
     height = height - 2 *margin
-
     return (
       <div>
       <svg width = {width + 2 * margin} height = {height + 2 * margin}>
         <g transform = {`translate(${margin}, ${margin})`}>
-          {this.renderLines(width, height - 100, [displayPeriod.from, displayPeriod.to], [0, 2000], stocks )}
+          {this.renderLines(width, height - 100, [displayPeriod.from, displayPeriod.to], [priceDomain.from, priceDomain.to], stocks, true )}
           <g  transform = {`translate(0, ${height - 100})`}>
             <AxisDate domain = {[displayPeriod.from, displayPeriod.to]} range = {[0, width]}/>
           </g>
 
-          <AxisPrice domain = {[0, 2000]} range = {[height - 100, 0]}/>
+          <AxisPrice domain = {[priceDomain.from, priceDomain.to]} range = {[height - 100, 0]}/>
           <g transform = {`translate(0, ${height - 70})`}>
-            {this.renderLines(width, 50, [stockPeriod.from, stockPeriod.to], [0,2000], stocks )}
+            {this.renderLines(width, 50, [stockPeriod.from, stockPeriod.to], [priceDomain.from, priceDomain.to], stocks, false )}
             <Brush
               width = {width}
               height={50}

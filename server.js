@@ -57,7 +57,7 @@ io.on('connection', function(socket){
   from.setFullYear(from.getFullYear() - 1)
   to.setDate(to.getDate() - 1)
 
-  socket.emit('stock period', {from, to})
+//  socket.emit('stock period', {from, to})
 
   stocksList.forEach( code => {
     getStock(code, from, to)
@@ -75,11 +75,17 @@ io.on('connection', function(socket){
     if (stocksList.indexOf(code) == -1) {
       getStock(code, from, to)
         .then( stock => {
-          stocksList.push(code)
-          socket.emit('add stock', {stock, code})
-          socket.broadcast.emit('add stock', {stock, code})
+          if (stock.length == 0) {
+            socket.emit('message', {head: 'message', body: 'This stock is no'})
+          } else {
+            stocksList.push(code)
+            socket.emit('add stock', {stock, code})
+            socket.broadcast.emit('add stock', {stock, code})
+          }
         })
-        .catch( err => console.log(err))
+        .catch( err => {
+          socket.emit('message', {head: 'error', body: err})
+        })
     }
   })
 })
