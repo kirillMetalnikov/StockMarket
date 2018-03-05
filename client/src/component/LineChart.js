@@ -14,7 +14,7 @@ class LineChart extends Component {
       .rangeRound([0, width])
       .domain(domainX)
     var y = d3.scaleLinear()
-      .rangeRound([height, 0])
+      .range([height, 0])
       .domain(domainY)
 
     var line = d3.line()

@@ -4,6 +4,9 @@ import * as d3 from 'd3'
 
 import Brush from './Brush'
 import LineChart from './LineChart'
+import AxisDate from './AxisDate'
+import AxisBrush from './AxisBrush'
+import AxisPrice from './AxisPrice'
 import {setDisplayPeriod} from '../actions'
 
 class Chart extends Component {
@@ -21,23 +24,36 @@ class Chart extends Component {
   }
 
   render() {
-    var { width, height, from, to, stocks, displayPeriod, stockPeriod} = this.props
-    console.log(stockPeriod)
+    var { width, height, stocks, displayPeriod, stockPeriod} = this.props
+    var margin = 50
+    width = width - 2 * margin
+    height = height - 2 *margin
+
     return (
-      <svg width = {width} height = {height}>
-        {this.renderLines(width, height - 100, [displayPeriod.from, displayPeriod.to], [0, 300], stocks )}
-        <g transform = {`translate(0, ${height - 70})`}>
-          {this.renderLines(width, 50, [stockPeriod.from, stockPeriod.to], [0, 300], stocks )}
-          <Brush
-            width = {width}
-            height={50}
-            domainX = {[stockPeriod.from, stockPeriod.to]}
-            brushFrom = {displayPeriod.from}
-            brushTo = {displayPeriod.to}
-            onChangeArea = {this.props.setDisplayPeriod.bind(this)}
-          />
+      <div>
+      <svg width = {width + 2 * margin} height = {height + 2 * margin}>
+        <g transform = {`translate(${margin}, ${margin})`}>
+          {this.renderLines(width, height - 100, [displayPeriod.from, displayPeriod.to], [0, 2000], stocks )}
+          <g  transform = {`translate(0, ${height - 100})`}>
+            <AxisDate domain = {[displayPeriod.from, displayPeriod.to]} range = {[0, width]}/>
+          </g>
+
+          <AxisPrice domain = {[0, 2000]} range = {[height - 100, 0]}/>
+          <g transform = {`translate(0, ${height - 70})`}>
+            {this.renderLines(width, 50, [stockPeriod.from, stockPeriod.to], [0,2000], stocks )}
+            <Brush
+              width = {width}
+              height={50}
+              domainX = {[stockPeriod.from, stockPeriod.to]}
+              brushFrom = {displayPeriod.from}
+              brushTo = {displayPeriod.to}
+              onChangeArea = {this.props.setDisplayPeriod.bind(this)}
+            />
+            <AxisBrush domain = {[stockPeriod.from, stockPeriod.to]} range = {[0, width]}/>
+          </g>
         </g>
       </svg>
+      </div>
     )
   }
 }

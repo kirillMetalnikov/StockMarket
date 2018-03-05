@@ -14,7 +14,7 @@ class App extends Component {
       <div>
         <h1>Header</h1>
         <ControlDatePanel />
-        <Chart width={960} height={500}/>
+        <Chart width={960} height={600}/>
         <AddStockForm />
       </div>
     )

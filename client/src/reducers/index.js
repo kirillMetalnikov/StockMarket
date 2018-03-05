@@ -14,20 +14,6 @@ function stocks(state = [], action) {
 var fromDate = new Date()
 fromDate.setFullYear(fromDate.getFullYear() - 3)
 
-function from (state = fromDate, action) {
-  switch (action.type) {
-    default:
-      return state
-  }
-}
-
-function to (state = new Date(), action) {
-  switch (action.type) {
-    default:
-      return state
-  }
-}
-
 function stockPeriod (state = {from: fromDate, to: new Date()}, action) {
   switch (action.type) {
     case SET_STOCK_PERIOD:
@@ -59,8 +45,6 @@ function displayTo (state = new Date(), action) {
 }
 export default combineReducers({
   stocks,
-  from,
-  to,
   displayPeriod,
   stockPeriod
 })
