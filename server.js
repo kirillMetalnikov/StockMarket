@@ -88,6 +88,13 @@ io.on('connection', function(socket){
         })
     }
   })
+
+  socket.on('delete stock', ({code}) => {
+    stocksList = stocksList.filter( stockCode => {
+      return stockCode != code
+    })
+    socket.broadcast.emit('delete stock', {code})
+  })
 })
 
 var port = process.env.PORT || 8080

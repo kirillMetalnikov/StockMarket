@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
+import {Col, FormGroup, InputGroup, FormControl, Button} from 'react-bootstrap'
 
 import {getStock} from '../actions'
 
@@ -24,10 +25,33 @@ class AddStockForm extends Component {
 
   render() {
     return (
-      <form onSubmit = { this.hundleSubmin.bind(this) }>
-        <input onChange = {this.hundleChange.bind(this)} value = {this.state.inputValue}></input>
-        <button type = 'submit'>Add</button>
-      </form>
+      <Col xs={12} sm={6} md={4} lg = {3}>
+        <div
+          style = {
+            {
+              height: 100,
+              border: '2px dashed red',
+              borderLeft: `7px solid red`,
+              padding: 10, position: 'relative',
+              marginBottom: 20
+            }
+          }
+        >
+          <div style = {{fontWeight: 800, padding: '3px 20px'}}>
+            Syncs in realtime
+          </div>
+          <div style = {{margin: 5}}>
+            <FormGroup>
+              <InputGroup>
+                <FormControl type="text"  onChange = {this.hundleChange.bind(this)} value = {this.state.inputValue}/>
+                <InputGroup.Button>
+                  <Button onClick = { this.hundleSubmin.bind(this) }>Add</Button>
+                </InputGroup.Button>
+              </InputGroup>
+            </FormGroup>
+          </div>
+        </div>
+      </Col>
     )
   }
 }

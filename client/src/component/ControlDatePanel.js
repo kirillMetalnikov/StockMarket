@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
 import {setDisplayPeriod} from '../actions'
-import {ButtonGroup, Button} from 'react-bootstrap'
+import {ButtonToolbar, ToggleButton, ToggleButtonGroup} from 'react-bootstrap'
 
 class ControlDatePanel extends Component {
   constructor(props) {
@@ -23,12 +23,14 @@ class ControlDatePanel extends Component {
     fromWeek.setDate(fromWeek.getDate() - 7)
 
     return (
-      <ButtonGroup>
-        <Button onClick = { () => this.props.setDisplayPeriod(from, to)}>All</Button>
-        <Button onClick = { () => this.props.setDisplayPeriod(from6Month, to)}>6 Month</Button>
-        <Button onClick = { () => this.props.setDisplayPeriod(from3Month, to)}>3 Month</Button>
-        <Button onClick = { () => this.props.setDisplayPeriod(fromMonth, to)}>Month</Button>
-      </ButtonGroup>
+      <ButtonToolbar>
+        <ToggleButtonGroup type="radio" name="options"  bsSize="small" defaultValue={1}>
+          <ToggleButton onClick = { () => this.props.setDisplayPeriod(from, to)} value={1}>All</ToggleButton>
+          <ToggleButton onClick = { () => this.props.setDisplayPeriod(from6Month, to)} value={2}>6 Month</ToggleButton>
+          <ToggleButton onClick = { () => this.props.setDisplayPeriod(from3Month, to)} value={3}>3 Month</ToggleButton>
+          <ToggleButton onClick = { () => this.props.setDisplayPeriod(fromMonth, to)} value={4}>Month</ToggleButton>
+        </ToggleButtonGroup>
+      </ButtonToolbar>
     )
   }
 }

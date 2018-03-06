@@ -4,16 +4,27 @@ import {Grid, PageHeader, Well} from 'react-bootstrap'
 import Chart from './Chart'
 import AddStockForm from './AddStockForm'
 import ControlDatePanel from './ControlDatePanel'
+import CodeList from './CodeList'
 
 class App extends Component {
   constructor(props) {
     super(props)
-    this.state = {clientWidth: 100}
+    this.state = {clientWidth: 1}
+    this.hundleResize = this.hundleResize.bind(this)
+  }
+
+  hundleResize() {
+    var {clientWidth} = this.well
+    this.setState({clientWidth})
   }
 
   componentDidMount() {
-    var {clientWidth} = this.well
-    this.setState({clientWidth})
+    this.hundleResize()
+    window.addEventListener("resize", this.hundleResize)
+  }
+
+  componentWillUnmount() {
+    window.addEventListener("resize", null)
   }
 
   render() {
@@ -26,6 +37,7 @@ class App extends Component {
               <Chart width={this.state.clientWidth} height={450}/>
             </div>
           </Well>
+          <CodeList />
           <AddStockForm />
         </Grid>
     )
