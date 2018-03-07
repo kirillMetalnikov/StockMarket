@@ -1,7 +1,7 @@
 import axios from 'axios'
 import socketIO from 'socket.io-client'
 
-import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD, SET_PRICE_DOMAIN, SET_ACTIVE, DELETE_STOCK} from '../const.js'
+import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD, SET_PRICE_DOMAIN, SET_ACTIVE, DELETE_STOCK, SET_ACTIVE_DATE} from '../const.js'
 
 const socket = socketIO.connect(`/`)
 
@@ -15,9 +15,12 @@ export const socketListener = dispatch => {
       if( quote.close < lowPrice) lowPrice = quote.close
     })
 
-    dispatch({type: SET_PRICE_DOMAIN, from: lowPrice, to: maxPrice})
-    dispatch({type: SET_STOCK_PERIOD, from: stock[stock.length - 1].date, to: stock[0].date})
-    dispatch({type: ADD_STOCK, stock, code})
+    if (stock.length != 0){
+      dispatch({type: SET_PRICE_DOMAIN, from: lowPrice, to: maxPrice})
+      dispatch({type: SET_STOCK_PERIOD, from: stock[stock.length - 1].date, to: stock[0].date})
+      dispatch({type: ADD_STOCK, stock, code})
+    }
+
   })
 
   socket.on('message', mess => {
@@ -25,7 +28,6 @@ export const socketListener = dispatch => {
   })
 
   socket.on('delete stock', ({code}) => {
-    console.log('delete stock' + code)
     dispatch({type: DELETE_STOCK, code})
   })
 /*  socket.on('stock period', ({from, to}) => {
@@ -58,4 +60,8 @@ export const setDisplayPeriod = (from, to) => dispatch => {
 
 export const setActive = (code) => dispatch => {
   dispatch({type: SET_ACTIVE, code})
+}
+
+export const setHoverDate = date => dispatch => {
+  dispatch({type: SET_ACTIVE_DATE, date})
 }

@@ -34,7 +34,7 @@ class App extends Component {
           <Well>
             <div ref = {ref => this.well = ref}>
               <ControlDatePanel />
-              <Chart width={this.state.clientWidth} height={450}/>
+              <Chart width={this.state.clientWidth} height={350}/>
             </div>
           </Well>
           <CodeList />

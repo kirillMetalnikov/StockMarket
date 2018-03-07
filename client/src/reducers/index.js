@@ -1,6 +1,6 @@
 import {combineReducers} from 'redux'
 
-import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD, SET_PRICE_DOMAIN, SET_ACTIVE, DELETE_STOCK} from '../const.js'
+import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD, SET_PRICE_DOMAIN, SET_ACTIVE, DELETE_STOCK, SET_ACTIVE_DATE} from '../const.js'
 
 function stocks(state = [], action) {
   switch (action.type) {
@@ -77,10 +77,21 @@ function activeCode (state = '', action) {
   }
 }
 
+const activeDate = (state = null, action) => {
+  switch (action.type) {
+    case SET_ACTIVE_DATE:
+      return action.date
+    default:
+      return state
+
+  }
+}
+
 export default combineReducers({
   stocks,
   displayPeriod,
   stockPeriod,
   priceDomain,
-  activeCode
+  activeCode,
+  activeDate
 })

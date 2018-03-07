@@ -7,11 +7,14 @@ import LineChart from './LineChart'
 import AxisDate from './AxisDate'
 import AxisBrush from './AxisBrush'
 import AxisPrice from './AxisPrice'
-import {setDisplayPeriod} from '../actions'
+import ActiveMarkers from './ActiveMarkers'
+import {setDisplayPeriod, setHoverDate} from '../actions'
 
 class Chart extends Component {
   constructor(props) {
     super(props)
+    this.renderHovers = this.renderHovers.bind(this)
+    this.mouseOverHundler = this.mouseOverHundler.bind(this)
   }
 
   renderLines(width, height, domainX, domainY, stocks, filtered, activeCode) {
@@ -30,24 +33,73 @@ class Chart extends Component {
     })
   }
 
+  mouseOverHundler(date) {
+    return () => this.props.setHoverDate(date)
+  }
+  
+  renderHovers(width, height, domainX, stocks) {
+    
+    var data = stocks.length ? stocks[0].stock : []
+    data = data.filter( ({date}) => {
+      return date.getTime() >= domainX[0].getTime() && date.getTime() <= domainX[1].getTime()
+    })
+    data = data.reverse()
+
+    var len = data.length
+    return (
+      data.map( (stock, index) => {
+        return <rect 
+          key = {stock.date}
+          x = {index * (width / len)}
+          y = {0}
+          width = {width / len}
+          height = {height}
+          opacity = '0.1'
+          onMouseOver = {this.mouseOverHundler(stock.date)}
+        />
+      })
+      
+    )
+  }
+  
+  componentDidMount() {
+  /*  d3.select(this.displayRef)
+      .on('mousemove', () => {
+      console.log(d3.event.clientX, d3.event.clientY)
+    })
+    */
+  }
+  
   render() {
-    var { width, height, stocks, displayPeriod, stockPeriod, priceDomain, activeCode} = this.props
-    var marginV = 20
+    var { width, height, stocks, displayPeriod, stockPeriod, priceDomain, activeCode, activeDate} = this.props
+    var marginV = 30
     var marginH = 50
-    width = width - 2 * marginV
-    height = height - 2 *marginH
+    width = width - 2 * marginH
+    height = height - 2 * marginV
+    
     return (
       <div>
-      <svg width = {width + 2 * marginV} height = {height + 2 * marginH}>
-        <g transform = {`translate(${marginH}, ${marginV})`}>
-          {this.renderLines(width, height - 50, [displayPeriod.from, displayPeriod.to], [priceDomain.from, priceDomain.to], stocks, true, activeCode )}
+      <svg width = {width + 2 * marginH} height = {height + 2 * marginV}>
+        <g  transform = {`translate(${marginH}, ${marginV})`}>
+          <g>
+            {this.renderLines(width, height - 50, [displayPeriod.from, displayPeriod.to], [priceDomain.from, priceDomain.to], stocks, true, activeCode )}
+            <ActiveMarkers
+              activeDate = {activeDate}
+              width = {width}
+              height = {height - 50}
+              data = {stocks}
+              domainX = {[displayPeriod.from, displayPeriod.to]}
+              domainY = {[priceDomain.from, priceDomain.to]}
+            />
+            
+            {this.renderHovers(width, height - 50, [displayPeriod.from, displayPeriod.to], stocks)}
+          </g>
           <g  transform = {`translate(0, ${height - 50})`}>
             <AxisDate domain = {[displayPeriod.from, displayPeriod.to]} range = {[0, width]}/>
           </g>
-
-          <AxisPrice domain = {[priceDomain.from, priceDomain.to]} range = {[height - 50, 0]}/>
-          <g transform = {`translate(0, ${height})`}>
-            {this.renderLines(width, 30, [stockPeriod.from, stockPeriod.to], [priceDomain.from, priceDomain.to], stocks, false, activeCode )}
+          <AxisPrice domain = {[priceDomain.from, priceDomain.to]} range = {[height - 50, 0]} width = {width}/>
+          <g transform = {`translate(0, ${height - 10})`}>
+            {this.renderLines(width, 30, [stockPeriod.from, stockPeriod.to], [priceDomain.from, priceDomain.to], stocks, false, -1 )}
             <AxisBrush domain = {[stockPeriod.from, stockPeriod.to]} range = {[0, width]}/>
             <Brush
               width = {width}
@@ -57,7 +109,6 @@ class Chart extends Component {
               brushTo = {displayPeriod.to}
               onChangeArea = {this.props.setDisplayPeriod.bind(this)}
             />
-
           </g>
         </g>
       </svg>
@@ -69,4 +120,4 @@ class Chart extends Component {
 const mapStateToProps = (state) => {
   return state
 }
-export default connect(mapStateToProps, {setDisplayPeriod})(Chart)
+export default connect(mapStateToProps, {setDisplayPeriod, setHoverDate})(Chart)

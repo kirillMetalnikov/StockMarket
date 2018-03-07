@@ -18,17 +18,17 @@ class Brush extends Component {
   makeBrush(width, height, brushFrom, brushTo) {
     this.brush = d3.brushX()
         .extent([[0, 0], [width, height]])
-        .on("end", this.brushed.bind(this))
+        .on("end", this.brushed)
 
     var startX = this.x(brushFrom)
     var endX = this.x(brushTo)
-
+    
     var gBrush = d3.select(this.brushRef)
     gBrush
       .call(this.brush)
       .call(this.brush.move, [startX, endX])
   }
-
+  
   brushed() {
     var area = d3.event.selection.map( xN => this.x.invert(Number(xN)))
     this.props.onChangeArea(area[0], area[1])
@@ -43,30 +43,29 @@ class Brush extends Component {
 
     if( width != this.props.width) {
       this.makeScale(width)
+      this.x.domain(domainX)
       this.makeBrush(width, height, brushFrom, brushTo)
     }
 
-    if (brushFrom.valueOf() == this.props.brushFrom.valueOf() && brushTo.valueOf() == this.props.brushTo.valueOf()) return
-
-    this.x.domain(domainX)
-
-    var startX = this.x(brushFrom)
-    var endX = this.x(brushTo)
-    var gBrush = d3.select(this.brushRef)
-    gBrush
-      .call(this.brush.move, [startX, endX])
+    if (brushFrom.valueOf() != this.props.brushFrom.valueOf() || brushTo.valueOf() != this.props.brushTo.valueOf()) {
+      this.x.domain(domainX)
+      this.makeBrush(width, height, brushFrom, brushTo)
+    }  
   }
 
   componentDidMount() {
-    var {width, height, brushFrom, brushTo} = this.props
+    var {width, height, brushFrom, brushTo, domainX} = this.props
     this.makeScale(width)
+    this.x.domain(domainX)
+    
     this.makeBrush(width, height, brushFrom, brushTo)
-
   }
 
   render() {
     return (
-      <g className = 'brush' ref={ ref => this.brushRef = ref}>
+      <g>
+        <g className = 'brush' ref={ ref => this.brushRef = ref}>
+        </g>
       </g>
     )
   }

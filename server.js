@@ -64,7 +64,9 @@ io.on('connection', function(socket){
       .then( stock => {
         socket.emit('add stock', {stock, code})
       })
-      .catch( err => console.log(err))
+      .catch( err => {
+        socket.emit('message', {head: 'error', body: err})
+      })
   })
 /*
   socket.on('disconnect', () => {
