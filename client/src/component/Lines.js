@@ -26,7 +26,8 @@ class Lines extends Component {
 
 }
 
-const mapStateToProps = ({priceDomain, stocks}) => {
+const mapStateToProps = ({stock}) => {
+  var {priceDomain, stocks} = stock
   return {domainY: [priceDomain.from, priceDomain.to], stocks}
 }
 

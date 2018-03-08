@@ -34,9 +34,8 @@ class ActiveMarkers extends Component {
           y1 = {0}
           x2 = {x(activeDate)}
           y2 = {height}
-          strokeWidth = {2}
+          strokeWidth = {4}
           stroke = 'gray'
-          ref = {ref => this.rectRefs = ref}
         />
         {data.map( (stock, index) => {
           var {close} = stock.stock.filter( ({date, close}) => {
@@ -58,7 +57,8 @@ class ActiveMarkers extends Component {
   }
 }
 
-const mapStateToProps = ({activeDate, stocks, displayPeriod, priceDomain}) => {
+const mapStateToProps = ({activeDate, stock}) => {
+  var {displayPeriod, priceDomain, stocks} = stock
   return {activeDate, data: stocks, domainX: [displayPeriod.from, displayPeriod.to], domainY: [priceDomain.from, priceDomain.to]}
 }
 export default connect(mapStateToProps)(ActiveMarkers)

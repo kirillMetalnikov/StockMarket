@@ -17,7 +17,9 @@ class Chart extends Component {
   }
 
   render() {
-    var { width, height, displayPeriod, stockPeriod, priceDomain, activeCode, tooltip} = this.props
+    var { width, height, stock, priceDomain, activeCode, tooltip} = this.props
+    var {displayPeriod, priceDomain, stockPeriod} = stock
+
     var marginV = 30
     var marginH = 50
     width = width - 2 * marginH
@@ -64,6 +66,7 @@ class Chart extends Component {
 }
 
 const mapStateToProps = (state) => {
+  console.log(state)
   return state
 }
 export default connect(mapStateToProps)(Chart)

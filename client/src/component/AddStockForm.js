@@ -56,7 +56,8 @@ class AddStockForm extends Component {
   }
 }
 
-const mapStateToProps = ({stocks, from, to}) => {
+const mapStateToProps = ({stock, from, to}) => {
+  var {stocks} = stock
   return {stocks, from, to};
 }
 export default connect(mapStateToProps, {getStock})(AddStockForm)

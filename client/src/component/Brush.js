@@ -74,7 +74,8 @@ class Brush extends Component {
   }
 }
 
-const mapStateToProps = ({stockPeriod, displayPeriod}) => {
+const mapStateToProps = ({stock}) => {
+  var {stockPeriod, displayPeriod} = stock
   return {domainX: [stockPeriod.from, stockPeriod.to], brushFrom: displayPeriod.from, brushTo: displayPeriod.to}
 }
 

@@ -9,7 +9,7 @@ class ControlDatePanel extends Component {
   }
 
   render() {
-    var {from, to} = this.props.stockPeriod
+    var {from, to} = this.props.stock.stockPeriod
     var from6Month = new Date()
     from6Month.setMonth(from6Month.getMonth() - 6)
 
@@ -35,7 +35,7 @@ class ControlDatePanel extends Component {
   }
 }
 
-const mapStateToProps = ({stockPeriod}) => {
-  return {stockPeriod};
+const mapStateToProps = ({stock}) => {
+  return {stock};
 }
 export default connect(mapStateToProps, {setDisplayPeriod})(ControlDatePanel)

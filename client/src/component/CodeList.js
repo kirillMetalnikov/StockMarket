@@ -56,7 +56,8 @@ class CodeList extends Component {
   }
 }
 
-const mapStateToProps = ({stocks, activeCode}) => {
+const mapStateToProps = ({stock, activeCode}) => {
+  var {stocks} = stock
   return {stocks, activeCode}
 }
 export default connect(mapStateToProps, {setActive, deleteStock})(CodeList)

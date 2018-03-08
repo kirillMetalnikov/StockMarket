@@ -3638,22 +3638,22 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var socket = _socket2.default.connect('/');
 
 var socketListener = exports.socketListener = function socketListener(dispatch) {
-  var lowPrice = Infinity;
-  var maxPrice = 0;
+  //  var lowPrice = Infinity
+  //  var maxPrice = 0
   socket.on('add stock', function (_ref) {
     var stock = _ref.stock,
         code = _ref.code;
 
     stock.forEach(function (quote) {
       quote.date = new Date(quote.date);
-      if (quote.close > maxPrice) maxPrice = quote.close;
-      if (quote.close < lowPrice) lowPrice = quote.close;
+      //      if( quote.close > maxPrice) maxPrice = quote.close
+      //      if( quote.close < lowPrice) lowPrice = quote.close
     });
 
     if (stock.length != 0) {
-      dispatch({ type: _const.SET_PRICE_DOMAIN, from: lowPrice, to: maxPrice });
-      dispatch({ type: _const.SET_STOCK_PERIOD, from: stock[stock.length - 1].date, to: stock[0].date });
-      dispatch({ type: _const.ADD_STOCK, stock: stock, code: code });
+      //      dispatch({type: SET_PRICE_DOMAIN, from: lowPrice, to: maxPrice})
+      //      dispatch({type: SET_STOCK_PERIOD, from: stock[stock.length - 1].date, to: stock[0].date})
+      dispatch({ type: _const.ADD_STOCK, stock: stock, code: code, from: stock[stock.length - 1].date, to: stock[0].date });
     }
   });
 
@@ -55283,11 +55283,14 @@ var Chart = function (_Component) {
       var _props = this.props,
           width = _props.width,
           height = _props.height,
-          displayPeriod = _props.displayPeriod,
-          stockPeriod = _props.stockPeriod,
+          stock = _props.stock,
           priceDomain = _props.priceDomain,
           activeCode = _props.activeCode,
           tooltip = _props.tooltip;
+      var displayPeriod = stock.displayPeriod,
+          priceDomain = stock.priceDomain,
+          stockPeriod = stock.stockPeriod;
+
 
       var marginV = 30;
       var marginH = 50;
@@ -55354,6 +55357,7 @@ var Chart = function (_Component) {
 }(_react.Component);
 
 var mapStateToProps = function mapStateToProps(state) {
+  console.log(state);
   return state;
 };
 exports.default = (0, _reactRedux.connect)(mapStateToProps)(Chart);
@@ -68594,8 +68598,9 @@ var Brush = function (_Component) {
 }(_react.Component);
 
 var mapStateToProps = function mapStateToProps(_ref2) {
-  var stockPeriod = _ref2.stockPeriod,
-      displayPeriod = _ref2.displayPeriod;
+  var stock = _ref2.stock;
+  var stockPeriod = stock.stockPeriod,
+      displayPeriod = stock.displayPeriod;
 
   return { domainX: [stockPeriod.from, stockPeriod.to], brushFrom: displayPeriod.from, brushTo: displayPeriod.to };
 };
@@ -73206,8 +73211,9 @@ var Lines = function (_Component) {
 }(_react.Component);
 
 var mapStateToProps = function mapStateToProps(_ref2) {
-  var priceDomain = _ref2.priceDomain,
-      stocks = _ref2.stocks;
+  var stock = _ref2.stock;
+  var priceDomain = stock.priceDomain,
+      stocks = stock.stocks;
 
   return { domainY: [priceDomain.from, priceDomain.to], stocks: stocks };
 };
@@ -73623,8 +73629,6 @@ var ActiveMarkers = function (_Component) {
   _createClass(ActiveMarkers, [{
     key: 'render',
     value: function render() {
-      var _this2 = this;
-
       var _props = this.props,
           width = _props.width,
           height = _props.height,
@@ -73657,18 +73661,15 @@ var ActiveMarkers = function (_Component) {
           y1: 0,
           x2: x(activeDate),
           y2: height,
-          strokeWidth: 2,
-          stroke: 'gray',
-          ref: function ref(_ref) {
-            return _this2.rectRefs = _ref;
-          }
+          strokeWidth: 4,
+          stroke: 'gray'
         }),
         data.map(function (stock, index) {
           var _React$createElement;
 
-          var close = stock.stock.filter(function (_ref2) {
-            var date = _ref2.date,
-                close = _ref2.close;
+          var close = stock.stock.filter(function (_ref) {
+            var date = _ref.date,
+                close = _ref.close;
 
             return date.getTime() == activeDate.getTime();
           })[0].close;
@@ -73684,11 +73685,12 @@ var ActiveMarkers = function (_Component) {
   return ActiveMarkers;
 }(_react.Component);
 
-var mapStateToProps = function mapStateToProps(_ref3) {
-  var activeDate = _ref3.activeDate,
-      stocks = _ref3.stocks,
-      displayPeriod = _ref3.displayPeriod,
-      priceDomain = _ref3.priceDomain;
+var mapStateToProps = function mapStateToProps(_ref2) {
+  var activeDate = _ref2.activeDate,
+      stock = _ref2.stock;
+  var displayPeriod = stock.displayPeriod,
+      priceDomain = stock.priceDomain,
+      stocks = stock.stocks;
 
   return { activeDate: activeDate, data: stocks, domainX: [displayPeriod.from, displayPeriod.to], domainY: [priceDomain.from, priceDomain.to] };
 };
@@ -73794,8 +73796,9 @@ var Hovers = function (_Component) {
 }(_react.Component);
 
 var mapStateToProps = function mapStateToProps(_ref3) {
-  var displayPeriod = _ref3.displayPeriod,
-      stocks = _ref3.stocks;
+  var stock = _ref3.stock;
+  var displayPeriod = stock.displayPeriod,
+      stocks = stock.stocks;
 
   return { domainX: [displayPeriod.from, displayPeriod.to], stocks: stocks };
 };
@@ -73910,9 +73913,10 @@ var AddStockForm = function (_Component) {
 }(_react.Component);
 
 var mapStateToProps = function mapStateToProps(_ref) {
-  var stocks = _ref.stocks,
+  var stock = _ref.stock,
       from = _ref.from,
       to = _ref.to;
+  var stocks = stock.stocks;
 
   return { stocks: stocks, from: from, to: to };
 };
@@ -73963,9 +73967,9 @@ var ControlDatePanel = function (_Component) {
     value: function render() {
       var _this2 = this;
 
-      var _props$stockPeriod = this.props.stockPeriod,
-          from = _props$stockPeriod.from,
-          to = _props$stockPeriod.to;
+      var _props$stock$stockPer = this.props.stock.stockPeriod,
+          from = _props$stock$stockPer.from,
+          to = _props$stock$stockPer.to;
 
       var from6Month = new Date();
       from6Month.setMonth(from6Month.getMonth() - 6);
@@ -74022,9 +74026,9 @@ var ControlDatePanel = function (_Component) {
 }(_react.Component);
 
 var mapStateToProps = function mapStateToProps(_ref) {
-  var stockPeriod = _ref.stockPeriod;
+  var stock = _ref.stock;
 
-  return { stockPeriod: stockPeriod };
+  return { stock: stock };
 };
 exports.default = (0, _reactRedux.connect)(mapStateToProps, { setDisplayPeriod: _actions.setDisplayPeriod })(ControlDatePanel);
 
@@ -74149,8 +74153,9 @@ var CodeList = function (_Component) {
 }(_react.Component);
 
 var mapStateToProps = function mapStateToProps(_ref2) {
-  var stocks = _ref2.stocks,
+  var stock = _ref2.stock,
       activeCode = _ref2.activeCode;
+  var stocks = stock.stocks;
 
   return { stocks: stocks, activeCode: activeCode };
 };
@@ -74173,7 +74178,10 @@ var _const = __webpack_require__(355);
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-function stocks() {
+var fromDate = new Date();
+fromDate.setFullYear(fromDate.getFullYear() - 3);
+
+var stocks = function stocks() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
   var action = arguments[1];
 
@@ -74189,20 +74197,18 @@ function stocks() {
       return state.filter(function (stock) {
         return stock.code != action.code;
       });
+
     default:
       return state;
   }
-}
+};
 
-var fromDate = new Date();
-fromDate.setFullYear(fromDate.getFullYear() - 3);
-
-function stockPeriod() {
+var stockPeriod = function stockPeriod() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { from: fromDate, to: new Date() };
   var action = arguments[1];
 
   switch (action.type) {
-    case _const.SET_STOCK_PERIOD:
+    case _const.ADD_STOCK:
       var from = action.from,
           to = action.to;
 
@@ -74210,9 +74216,9 @@ function stockPeriod() {
     default:
       return state;
   }
-}
+};
 
-function displayPeriod() {
+var displayPeriod = function displayPeriod() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { from: fromDate, to: new Date() };
   var action = arguments[1];
 
@@ -74222,7 +74228,7 @@ function displayPeriod() {
           to = action.to;
 
       return { from: from, to: to };
-    case _const.SET_STOCK_PERIOD:
+    case _const.ADD_STOCK:
       var from = action.from,
           to = action.to;
 
@@ -74230,19 +74236,9 @@ function displayPeriod() {
     default:
       return state;
   }
-}
+};
 
-function displayTo() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Date();
-  var action = arguments[1];
-
-  switch (action.type) {
-    default:
-      return state;
-  }
-}
-
-function priceDomain() {
+var priceDomain = function priceDomain() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { from: 0, to: 0 };
   var action = arguments[1];
 
@@ -74256,7 +74252,84 @@ function priceDomain() {
     default:
       return state;
   }
-}
+};
+
+var from = new Date();
+from.setFullYear(from.getFullYear() - 3);
+var to = new Date();
+
+var initialStock = {
+  stockPeriod: { from: from, to: to },
+  displayPeriod: { from: from, to: to },
+  priceDomain: { from: 0, to: 0 },
+  stocks: [],
+  displayStocks: []
+};
+
+var getMinMaxPrice = function getMinMaxPrice(stocks) {
+  var lowPrice = Infinity;
+  var maxPrice = 0;
+  stocks.forEach(function (_ref) {
+    var stock = _ref.stock;
+
+    stock.forEach(function (quote) {
+      if (quote.close > maxPrice) maxPrice = quote.close;
+      if (quote.close < lowPrice) lowPrice = quote.close;
+    });
+  });
+  return { from: lowPrice, to: maxPrice };
+};
+
+var getDisplayStock = function getDisplayStock(stocks, displayPeriod) {
+  var from = displayPeriod.from,
+      to = displayPeriod.to;
+
+  return stocks.map(function (_ref2) {
+    var stock = _ref2.stock,
+        code = _ref2.code;
+
+    stock = stock.filter(function (_ref3) {
+      var date = _ref3.date;
+
+      return date.getTime() >= from.getTime() && date.getTime() <= to.getTime();
+    });
+
+    return { code: code, stock: stock };
+  });
+};
+
+var stock = function stock() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialStock;
+  var action = arguments[1];
+
+  var newState = Object.assign({}, state);
+  switch (action.type) {
+    case _const.SET_DISPLAY_PERIOD:
+      newState.displayPeriod = displayPeriod(newState.displayPeriod, action);
+      newState.displayStocks = getDisplayStock(newState.stocks, newState.displayPeriod);
+      return newState;
+    case _const.SET_PRICE_DOMAIN:
+      newState.priceDomain = priceDomain(newState.priceDomain, action);
+      return newState;
+    case _const.ADD_STOCK:
+      if (state.stocks.length == 0) {
+        newState.stockPeriod = stockPeriod(newState.stockPeriod, action);
+        newState.displayPeriod = displayPeriod(newState.displayPeriod, action);
+      }
+      newState.priceDomain = priceDomain(newState.priceDomain, action);
+      newState.stocks = stocks(newState.stocks, action);
+      newState.priceDomain = getMinMaxPrice(newState.stocks);
+      newState.displayStocks = getDisplayStock(newState.stocks, newState.displayPeriod);
+      return newState;
+    case _const.DELETE_STOCK:
+      newState.stocks = stocks(newState.stocks, action);
+      newState.priceDomain = getMinMaxPrice(newState.stocks);
+      newState.displayStocks = getDisplayStock(newState.stocks, newState.displayPeriod);
+      return newState;
+    default:
+      return state;
+  }
+};
 
 function activeCode() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
@@ -74301,10 +74374,7 @@ var tooltip = function tooltip() {
 };
 
 exports.default = (0, _redux.combineReducers)({
-  stocks: stocks,
-  displayPeriod: displayPeriod,
-  stockPeriod: stockPeriod,
-  priceDomain: priceDomain,
+  stock: stock,
   activeCode: activeCode,
   activeDate: activeDate,
   tooltip: tooltip

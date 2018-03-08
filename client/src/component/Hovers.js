@@ -46,7 +46,8 @@ class Hovers extends Component {
   }
 }
 
-const mapStateToProps = ({displayPeriod, stocks}) => {
-  return {domainX: [displayPeriod.from, displayPeriod.to], stocks: stocks}
+const mapStateToProps = ({stock}) => {
+  var {displayPeriod, stocks} = stock
+  return {domainX: [displayPeriod.from, displayPeriod.to], stocks}
 }
 export default connect(mapStateToProps, {setHoverDate, setTooltip})(Hovers)
