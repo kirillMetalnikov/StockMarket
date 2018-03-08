@@ -6,8 +6,15 @@ import {ButtonToolbar, ToggleButton, ToggleButtonGroup} from 'react-bootstrap'
 class ControlDatePanel extends Component {
   constructor(props) {
     super(props)
+    this.onClickHundler = this.onClickHundler.bind(this)
   }
 
+  onClickHundler(from, to) {
+    return () => {
+      this.props.setDisplayPeriod(from, to)
+    }
+  }
+  
   render() {
     var {from, to} = this.props.stock.stockPeriod
     var from6Month = new Date()
@@ -25,10 +32,10 @@ class ControlDatePanel extends Component {
     return (
       <ButtonToolbar>
         <ToggleButtonGroup type="radio" name="options"  bsSize="small" defaultValue={1}>
-          <ToggleButton onClick = { () => this.props.setDisplayPeriod(from, to)} value={1}>All</ToggleButton>
-          <ToggleButton onClick = { () => this.props.setDisplayPeriod(from6Month, to)} value={2}>6 Month</ToggleButton>
-          <ToggleButton onClick = { () => this.props.setDisplayPeriod(from3Month, to)} value={3}>3 Month</ToggleButton>
-          <ToggleButton onClick = { () => this.props.setDisplayPeriod(fromMonth, to)} value={4}>Month</ToggleButton>
+          <ToggleButton onClick = { this.onClickHundler(from, to) } value={1}>All</ToggleButton>
+          <ToggleButton onClick = { this.onClickHundler(from6Month, to)} value={2} >6 Month</ToggleButton>
+          <ToggleButton onClick = { this.onClickHundler(from3Month, to)} value={3}>3 Month</ToggleButton>
+          <ToggleButton onClick = { this.onClickHundler(fromMonth, to)} value={4}>Month</ToggleButton>
         </ToggleButtonGroup>
       </ButtonToolbar>
     )

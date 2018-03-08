@@ -20,7 +20,7 @@ const getStock = (symbol, from, to) => {
           var {date, close} = quote
           return {date, close}
         } )
-        resolve(quotes)
+        resolve(quotes.reverse())
       })
   })
 }

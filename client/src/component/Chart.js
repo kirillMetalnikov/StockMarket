@@ -10,6 +10,7 @@ import AxisBrush from './AxisBrush'
 import AxisPrice from './AxisPrice'
 import ActiveMarkers from './ActiveMarkers'
 import Hovers from './Hovers'
+import {setHoverDate, setTooltip} from '../actions'
 
 class Chart extends Component {
   constructor(props) {
@@ -18,7 +19,7 @@ class Chart extends Component {
 
   render() {
     var { width, height, stock, priceDomain, activeCode, tooltip} = this.props
-    var {displayPeriod, priceDomain, stockPeriod} = stock
+    var {displayPeriod, priceDomain, stockPeriod, displayStocks, stocks} = stock
 
     var marginV = 30
     var marginH = 50
@@ -34,7 +35,7 @@ class Chart extends Component {
                 width = {width}
                 height = {height - 50}
                 domainX = {[displayPeriod.from, displayPeriod.to]}
-                filtered = {true}
+                stocks = {displayStocks}
                 activeCode ={activeCode}
               />
               <ActiveMarkers width = {width} height = {height - 50}/>
@@ -49,7 +50,7 @@ class Chart extends Component {
                 width = {width}
                 height = {30}
                 domainX = {[stockPeriod.from, stockPeriod.to]}
-                filtered = {false}
+                stocks = {stocks}
                 activeCode = {-1}
               />
               <AxisBrush domain = {[stockPeriod.from, stockPeriod.to]} range = {[0, width]}/>
@@ -57,16 +58,20 @@ class Chart extends Component {
             </g>
           </g>
         </svg>
-        <Overlay container = {this} placement="right" show = {tooltip.show} target = {tooltip.target}>
-          <Tooltip id = "tooltip" className="in" style = { {pointerEvents: 'none'} }>{tooltip.text}</Tooltip>
-        </Overlay>
+        {
+          tooltip.target ?
+            (<Overlay container = {this} placement="left" show = {tooltip.show} target = {tooltip.target}>
+              <Tooltip id = "tooltip" className="in" style = { {pointerEvents: 'none'}}>{tooltip.text}</Tooltip>
+            </Overlay>):
+            null 
+        }
+
       </div>
     )
   }
 }
 
 const mapStateToProps = (state) => {
-  console.log(state)
   return state
 }
-export default connect(mapStateToProps)(Chart)
+export default connect(mapStateToProps, {setHoverDate, setTooltip})(Chart)

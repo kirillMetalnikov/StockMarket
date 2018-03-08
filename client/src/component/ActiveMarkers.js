@@ -12,7 +12,7 @@ class ActiveMarkers extends Component {
     if (!activeDate) {
       return null
     }
-
+//    console.log(data)
     let color = d3.schemeCategory20
 
     var x = d3.scaleTime()
@@ -22,14 +22,10 @@ class ActiveMarkers extends Component {
       .range([height, 0])
       .domain(domainY)
 
-    var line = d3.line()
-        .x(d => x(d.date))
-        .y(d => y(+d.close))
-    this.path = line(data || [])
-
     return (
       <g>
         <line
+          className = {'marker'}
           x1 = {x(activeDate)}
           y1 = {0}
           x2 = {x(activeDate)}
@@ -37,14 +33,14 @@ class ActiveMarkers extends Component {
           strokeWidth = {4}
           stroke = 'gray'
         />
-        {data.map( (stock, index) => {
-          var {close} = stock.stock.filter( ({date, close}) => {
+        {data.map( ({stock, code}, index) => {
+          var {close} = stock.find( ({date}) => {
             return date.getTime() == activeDate.getTime()
-          })[0]
-
+          })
+          if (!close) return
           return (
             <circle key = {index}
-              key = {stock.code}
+              key = {code}
               r = {3}
               cx = {x(activeDate)}
               cy = {y(+close)}
@@ -58,7 +54,7 @@ class ActiveMarkers extends Component {
 }
 
 const mapStateToProps = ({activeDate, stock}) => {
-  var {displayPeriod, priceDomain, stocks} = stock
-  return {activeDate, data: stocks, domainX: [displayPeriod.from, displayPeriod.to], domainY: [priceDomain.from, priceDomain.to]}
+  var {displayPeriod, priceDomain, displayStocks} = stock
+  return {activeDate, data: displayStocks, domainX: [displayPeriod.from, displayPeriod.to], domainY: [priceDomain.from, priceDomain.to]}
 }
 export default connect(mapStateToProps)(ActiveMarkers)
