@@ -1,5 +1,8 @@
 import React, {Component} from 'react'
+import { connect } from 'react-redux'
 import * as d3 from 'd3'
+
+import {setDisplayPeriod} from '../actions'
 
 class Brush extends Component {
   constructor(props) {
@@ -22,16 +25,16 @@ class Brush extends Component {
 
     var startX = this.x(brushFrom)
     var endX = this.x(brushTo)
-    
+
     var gBrush = d3.select(this.brushRef)
     gBrush
       .call(this.brush)
       .call(this.brush.move, [startX, endX])
   }
-  
+
   brushed() {
     var area = d3.event.selection.map( xN => this.x.invert(Number(xN)))
-    this.props.onChangeArea(area[0], area[1])
+    this.props.setDisplayPeriod(area[0], area[1])
   }
 
   shouldComponentUpdate() {
@@ -50,14 +53,14 @@ class Brush extends Component {
     if (brushFrom.valueOf() != this.props.brushFrom.valueOf() || brushTo.valueOf() != this.props.brushTo.valueOf()) {
       this.x.domain(domainX)
       this.makeBrush(width, height, brushFrom, brushTo)
-    }  
+    }
   }
 
   componentDidMount() {
     var {width, height, brushFrom, brushTo, domainX} = this.props
     this.makeScale(width)
     this.x.domain(domainX)
-    
+
     this.makeBrush(width, height, brushFrom, brushTo)
   }
 
@@ -71,4 +74,8 @@ class Brush extends Component {
   }
 }
 
-export default Brush
+const mapStateToProps = ({stockPeriod, displayPeriod}) => {
+  return {domainX: [stockPeriod.from, stockPeriod.to], brushFrom: displayPeriod.from, brushTo: displayPeriod.to}
+}
+
+export default connect(mapStateToProps, {setDisplayPeriod})(Brush)

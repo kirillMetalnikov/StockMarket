@@ -1,7 +1,7 @@
 import axios from 'axios'
 import socketIO from 'socket.io-client'
 
-import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD, SET_PRICE_DOMAIN, SET_ACTIVE, DELETE_STOCK, SET_ACTIVE_DATE} from '../const.js'
+import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD, SET_PRICE_DOMAIN, SET_ACTIVE, DELETE_STOCK, SET_ACTIVE_DATE, SET_TOOLTIP} from '../const.js'
 
 const socket = socketIO.connect(`/`)
 
@@ -64,4 +64,9 @@ export const setActive = (code) => dispatch => {
 
 export const setHoverDate = date => dispatch => {
   dispatch({type: SET_ACTIVE_DATE, date})
+}
+
+export const setTooltip = (show, target, text) => dispatch => {
+  text = text.toString()
+  dispatch({type: SET_TOOLTIP, tooltip: {show, target, text}})
 }
