@@ -24,7 +24,7 @@ class CodeList extends Component {
           let headerColor = activeCode == code ? 'black' : color[index]
           let active = false
           return (
-            <Col xs={12} sm={6} md={4} lg = {3} key = {code} >
+            <Col sm={12} md={4} lg = {3} key = {code} >
               <div
                 style = {
                   {

@@ -73721,7 +73721,7 @@ var Hovers = function (_Component) {
             y: 0,
             width: nextX - x(stock.date),
             height: height,
-            opacity: '0.1',
+            opacity: '0.0',
             onMouseOver: _this4.mouseOverHundler(stock.date, index, placement),
             onMouseOut: _this4.mouseOutHundler(stock.date, index),
             ref: function ref(_ref3) {
@@ -73916,7 +73916,7 @@ var AddStockForm = function (_Component) {
     value: function render() {
       return _react2.default.createElement(
         _reactBootstrap.Col,
-        { xs: 12, sm: 6, md: 4, lg: 3 },
+        { sm: 12, md: 4, lg: 3 },
         _react2.default.createElement(
           'div',
           {
@@ -74168,7 +74168,7 @@ var CodeList = function (_Component) {
           var active = false;
           return _react2.default.createElement(
             _reactBootstrap.Col,
-            { xs: 12, sm: 6, md: 4, lg: 3, key: code },
+            { sm: 12, md: 4, lg: 3, key: code },
             _react2.default.createElement(
               'div',
               {

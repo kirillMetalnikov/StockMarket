@@ -73,7 +73,7 @@ class Hovers extends Component {
               y = {0}
               width = {nextX - x(stock.date)}
               height = {height}
-              opacity = '0.1'
+              opacity = '0.0'
               onMouseOver = {this.mouseOverHundler(stock.date, index, placement)}
               onMouseOut = {this.mouseOutHundler(stock.date, index)}
               ref = {ref => this.rectRefs[index] = ref}

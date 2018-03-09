@@ -25,7 +25,7 @@ class AddStockForm extends Component {
 
   render() {
     return (
-      <Col xs={12} sm={6} md={4} lg = {3}>
+      <Col sm={12} md={4} lg = {3}>
         <div
           style = {
             {
