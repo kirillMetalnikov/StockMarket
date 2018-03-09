@@ -5,6 +5,7 @@ import Chart from './Chart'
 import AddStockForm from './AddStockForm'
 import ControlDatePanel from './ControlDatePanel'
 import CodeList from './CodeList'
+import Message from './Message'
 
 class App extends Component {
   constructor(props) {
@@ -31,15 +32,18 @@ class App extends Component {
     return (
         <Grid>
           <PageHeader>Watch stocks</PageHeader>
-          <Well>
-            <div ref = {ref => this.well = ref}>
-              <ControlDatePanel active = {this.state.activeButton}/>
-              <Chart width={this.state.clientWidth} height={350}/>
-            </div>
-          </Well>
+          <div style = {{boxShadow: `4px 4px 8px 1px gray`}}>
+            <Well>
+              <div ref = {ref => this.well = ref}>
+                <ControlDatePanel active = {this.state.activeButton}/>
+                <Chart width={this.state.clientWidth} height={350}/>
+              </div>
+            </Well>
+          </div>
           <CodeList />
           <AddStockForm />
-        </Grid>
+          <Message />
+        </Grid>  
     )
   }
 }

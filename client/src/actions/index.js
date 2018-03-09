@@ -1,7 +1,11 @@
 import axios from 'axios'
 import socketIO from 'socket.io-client'
 
-import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD, SET_PRICE_DOMAIN, SET_ACTIVE, DELETE_STOCK, SET_ACTIVE_DATE, SET_TOOLTIP, SET_ACTIVE_BUTTON} from '../const.js'
+import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD,
+  SET_PRICE_DOMAIN, SET_ACTIVE, DELETE_STOCK,
+  SET_ACTIVE_DATE, SET_TOOLTIP, SET_ACTIVE_BUTTON,
+  SHOW_MODAL, HIDE_MODAL
+} from '../const.js'
 
 const socket = socketIO.connect(`/`)
 
@@ -17,8 +21,8 @@ export const socketListener = dispatch => {
 
   })
 
-  socket.on('message', mess => {
-    console.log(mess)
+  socket.on('message', ({head, body}) => {
+    dispatch({type: SHOW_MODAL, head, body, show: true})
   })
 
   socket.on('delete stock', ({code}) => {
@@ -60,4 +64,8 @@ export const setTooltip = (show, target, data, placement) => dispatch => {
 
 export const setActiveButton = (e) => dispatch => {
   dispatch({type: SET_ACTIVE_BUTTON, active: e})
+}
+
+export const hideModal = () => dispatch => {
+  dispatch({type: HIDE_MODAL})
 }

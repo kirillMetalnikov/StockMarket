@@ -33,7 +33,8 @@ class AddStockForm extends Component {
               border: '2px dashed red',
               borderLeft: `7px solid red`,
               padding: 10, position: 'relative',
-              marginBottom: 20
+              marginBottom: 20,
+              boxShadow: `4px 4px 8px 1px gray`
             }
           }
         >

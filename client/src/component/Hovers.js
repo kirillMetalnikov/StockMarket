@@ -64,10 +64,12 @@ class Hovers extends Component {
         var placement = index < data.length / 2 ? 'right' : 'left'
         return (
           <g  key = {stock.date}>
-            {(activeDate && (stock.date.getTime() == activeDate.getTime()))
-              ? <ActiveMarkers width = {width} height = {height} activeDate = {stock.date}/>
-              : null
-            }
+            <g ref = {ref => this.rectRefs[index] = ref}>
+              {(activeDate && (stock.date.getTime() == activeDate.getTime()))
+                ? <ActiveMarkers width = {width} height = {height} activeDate = {stock.date}/>
+                : null
+              }
+            </g>
             <rect
               x = {x(stock.date)}
               y = {0}
@@ -76,7 +78,7 @@ class Hovers extends Component {
               opacity = '0.0'
               onMouseOver = {this.mouseOverHundler(stock.date, index, placement)}
               onMouseOut = {this.mouseOutHundler(stock.date, index)}
-              ref = {ref => this.rectRefs[index] = ref}
+
             />
           </g>
         )

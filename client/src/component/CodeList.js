@@ -34,7 +34,8 @@ class CodeList extends Component {
                     padding: 10,
                     paddingTop: 3,
                     marginBottom: 20,
-                    color: 'gray'
+                    color: 'gray',
+                    boxShadow: `4px 4px 8px 1px gray`
                   }
                 }
                 onMouseOver = {() => this.props.setActive(code)}

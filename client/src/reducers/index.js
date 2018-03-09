@@ -1,6 +1,10 @@
 import {combineReducers} from 'redux'
 
-import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD, SET_PRICE_DOMAIN, SET_ACTIVE, DELETE_STOCK, SET_ACTIVE_DATE, SET_TOOLTIP, SET_ACTIVE_BUTTON} from '../const.js'
+import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD,
+  SET_PRICE_DOMAIN, SET_ACTIVE, DELETE_STOCK,
+  SET_ACTIVE_DATE, SET_TOOLTIP, SET_ACTIVE_BUTTON,
+  SHOW_MODAL, HIDE_MODAL
+} from '../const.js'
 
 var fromDate = new Date()
 fromDate.setFullYear(fromDate.getFullYear() - 3)
@@ -166,10 +170,23 @@ const activeButton = (state = 1, action) => {
       return state
   }
 }
+
+const message = (state = {head: '', body: '', show: false}, action) => {
+  switch (action.type) {
+    case SHOW_MODAL:
+    var {head, body, show} = action
+      return {head, body, show}
+    case HIDE_MODAL:
+      return {head: '', body: '', show: false}
+    default:
+      return state
+  }
+}
 export default combineReducers({
   stock,
   activeCode,
   activeDate,
   tooltip,
-  activeButton
+  activeButton,
+  message
 })
