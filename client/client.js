@@ -3430,14 +3430,16 @@ var socket = _socket2.default.connect('/');
 var socketListener = exports.socketListener = function socketListener(dispatch) {
   socket.on('add stock', function (_ref) {
     var stock = _ref.stock,
-        code = _ref.code;
+        code = _ref.code,
+        exchangeName = _ref.exchangeName,
+        longName = _ref.longName;
 
     stock.forEach(function (quote) {
       quote.date = new Date(quote.date);
     });
 
     if (stock.length != 0) {
-      dispatch({ type: _const.ADD_STOCK, stock: stock, code: code, from: stock[0].date, to: stock[stock.length - 1].date });
+      dispatch({ type: _const.ADD_STOCK, stock: stock, code: code, exchangeName: exchangeName, longName: longName, from: stock[0].date, to: stock[stock.length - 1].date });
     }
   });
 
@@ -74157,7 +74159,9 @@ var CodeList = function (_Component) {
         'div',
         null,
         stocks.map(function (_ref, index) {
-          var code = _ref.code;
+          var code = _ref.code,
+              longName = _ref.longName,
+              exchangeName = _ref.exchangeName;
 
           var borderColor = activeCode == code ? color[index] : 'gray';
           var headerColor = activeCode == code ? 'black' : color[index];
@@ -74193,7 +74197,10 @@ var CodeList = function (_Component) {
               _react2.default.createElement(
                 'div',
                 { style: { margin: 5 } },
-                'bla-bla-bla'
+                longName,
+                ' (',
+                exchangeName,
+                ')'
               )
             )
           );
@@ -74245,7 +74252,7 @@ var stocks = function stocks() {
       });
       if (codes.indexOf(action.code) != -1) return state;
 
-      return [].concat(_toConsumableArray(state), [{ code: action.code, stock: action.stock }]);
+      return [].concat(_toConsumableArray(state), [{ code: action.code, stock: action.stock, exchangeName: action.exchangeName, longName: action.longName }]);
     case _const.DELETE_STOCK:
       return state.filter(function (stock) {
         return stock.code != action.code;

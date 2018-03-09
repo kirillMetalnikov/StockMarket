@@ -13,7 +13,7 @@ const stocks = (state = [], action) => {
       } ))
       if (codes.indexOf(action.code) != -1) return state
 
-      return [...state, {code: action.code, stock: action.stock}]
+      return [...state, {code: action.code, stock: action.stock, exchangeName: action.exchangeName, longName: action.longName}]
     case DELETE_STOCK:
       return state.filter( stock => {
         return stock.code != action.code

@@ -6,22 +6,34 @@ var io = require('socket.io')(http)
 var yahooFinance = require('yahoo-finance')
 
 var path = process.cwd()
-var stocksList = ['fb', 'nflx']
+var stocksList = [{code: 'fb'}, {code: 'nflx'}]
 
 const getStock = (symbol, from, to) => {
   return new Promise ( (resolve, reject) => {
     yahooFinance.historical({
-      symbol,
-      from, //'2015-01-01'
-      to, //'2015-01-01'
+        symbol,
+        from, //'2015-01-01'
+        to, //'2015-01-01'
       }, (err, quotes) => {
         if (err) reject(err)
         quotes = quotes.map(quote => {
           var {date, close} = quote
           return {date, close}
         } )
-        resolve(quotes.reverse())
+        resolve({stock: quotes.reverse(), symbol})
       })
+  })
+}
+
+const getFullName = ({stock, symbol}) => {
+  return new Promise( (resolve, reject) => {
+    yahooFinance.quote({
+        symbol,
+        modules: ['price']       // optional; default modules.
+      }, (err, {price}) => {
+        var {exchangeName, longName} = price
+        resolve({stock, exchangeName, longName})
+    })
   })
 }
 
@@ -33,23 +45,6 @@ app.route('/')
     res.sendFile(path + '/client/public/index.html')
   })
 
-app.route('/api/getStock/:code/:from/:to')
-  .get((req, res) => {
-    yahooFinance.historical({
-      symbol: req.params.code,
-      from: req.params.from, //'2015-01-01'
-      to: req.params.to, //'2015-01-01'
-      // period: 'd'  // 'd' (daily), 'w' (weekly), 'm' (monthly), 'v' (dividends only)
-    }, (err, quotes) => {
-      if (err) console.log(err)
-      quotes = quotes.map(quote => {
-        var {date, close} = quote
-        return {date, close}
-      } )
-      res.json(quotes)
-    });
-  })
-
 io.on('connection', function(socket){
 //  console.log('a user connected')
   var from = new Date()
@@ -59,10 +54,11 @@ io.on('connection', function(socket){
 
 //  socket.emit('stock period', {from, to})
 
-  stocksList.forEach( code => {
+  stocksList.forEach( ({code}) => {
     getStock(code, from, to)
-      .then( stock => {
-        socket.emit('add stock', {stock, code})
+      .then(getFullName)
+      .then( ({stock, exchangeName, longName}) => {
+        socket.emit('add stock', {stock, code, exchangeName, longName})
       })
       .catch( err => {
         socket.emit('message', {head: 'error', body: err})
@@ -76,24 +72,27 @@ io.on('connection', function(socket){
   socket.on('get stock', ({code})=> {
     if (stocksList.indexOf(code) == -1) {
       getStock(code, from, to)
-        .then( stock => {
+        .then(getFullName)
+        .then( ({stock, exchangeName, longName}) => {
           if (stock.length == 0) {
             socket.emit('message', {head: 'message', body: 'This stock is no'})
           } else {
-            stocksList.push(code)
-            socket.emit('add stock', {stock, code})
-            socket.broadcast.emit('add stock', {stock, code})
+            stocksList.push({code})
+            socket.emit('add stock', {stock, code, exchangeName, longName})
+            socket.broadcast.emit('add stock', {stock, code, exchangeName, longName})
           }
         })
-        .catch( err => {
+        .catch( (err) => {
           socket.emit('message', {head: 'error', body: err})
         })
     }
   })
 
   socket.on('delete stock', ({code}) => {
-    stocksList = stocksList.filter( stockCode => {
-      return stockCode != code
+    var deleteCode = code
+
+    stocksList = stocksList.filter( ({code}) => {
+      return deleteCode != code
     })
     socket.broadcast.emit('delete stock', {code})
   })

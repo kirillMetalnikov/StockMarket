@@ -19,7 +19,7 @@ class CodeList extends Component {
     var color = d3.schemeCategory20
     return (
       <div>
-        {stocks.map( ({code}, index) => {
+        {stocks.map( ({code, longName, exchangeName}, index) => {
           let borderColor = activeCode == code ? color[index] : 'gray'
           let headerColor = activeCode == code ? 'black' : color[index]
           let active = false
@@ -45,7 +45,7 @@ class CodeList extends Component {
                     {code}
                 </div>
                 <div style = {{margin: 5}}>
-                  bla-bla-bla
+                  {longName} ({exchangeName})
                 </div>
               </div>
             </Col>

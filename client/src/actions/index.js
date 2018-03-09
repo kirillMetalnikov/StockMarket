@@ -6,13 +6,13 @@ import {ADD_STOCK, SET_DISPLAY_PERIOD, SET_STOCK_PERIOD, SET_PRICE_DOMAIN, SET_A
 const socket = socketIO.connect(`/`)
 
 export const socketListener = dispatch => {
-  socket.on('add stock', ({stock, code}) => {
+  socket.on('add stock', ({stock, code, exchangeName, longName}) => {
     stock.forEach( quote => {
       quote.date = new Date(quote.date)
     })
 
     if (stock.length != 0){
-      dispatch({type: ADD_STOCK, stock, code, from: stock[0].date, to: stock[stock.length - 1].date})
+      dispatch({type: ADD_STOCK, stock, code, exchangeName, longName, from: stock[0].date, to: stock[stock.length - 1].date})
     }
 
   })
