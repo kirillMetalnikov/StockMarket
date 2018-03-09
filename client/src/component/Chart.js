@@ -67,7 +67,7 @@ class Chart extends Component {
         </svg>
         {
           tooltip.target ?
-            (<Overlay container = {this} placement="left" show = {tooltip.show} target = {tooltip.target}>
+            (<Overlay container = {this} placement={tooltip.placement} show = {tooltip.show} target = {tooltip.target}>
               <Tooltip id = "tooltip" className="in" style = { {pointerEvents: 'none'}}><h6>{activeDate.toString()}</h6>{this.renderTooltip(tooltip.data)}</Tooltip>
             </Overlay>):
             null

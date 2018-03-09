@@ -151,8 +151,8 @@ const activeDate = (state = null, action) => {
 const tooltip = (state ={}, action) => {
   switch (action.type) {
     case SET_TOOLTIP:
-      var {show, target, data} = action.tooltip
-      return {show, target, data}
+      var {show, target, data, placement} = action.tooltip
+      return {show, target, data, placement}
     default:
       return state
   }

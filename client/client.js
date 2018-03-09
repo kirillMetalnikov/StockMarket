@@ -3490,9 +3490,9 @@ var setHoverDate = exports.setHoverDate = function setHoverDate(date) {
   };
 };
 
-var setTooltip = exports.setTooltip = function setTooltip(show, target, data, activeDate) {
+var setTooltip = exports.setTooltip = function setTooltip(show, target, data, placement) {
   return function (dispatch) {
-    dispatch({ type: _const.SET_TOOLTIP, tooltip: { show: show, target: target, data: data } });
+    dispatch({ type: _const.SET_TOOLTIP, tooltip: { show: show, target: target, data: data, placement: placement } });
   };
 };
 
@@ -55354,7 +55354,7 @@ var Chart = function (_Component) {
         ),
         tooltip.target ? _react2.default.createElement(
           _reactBootstrap.Overlay,
-          { container: this, placement: 'left', show: tooltip.show, target: tooltip.target },
+          { container: this, placement: tooltip.placement, show: tooltip.show, target: tooltip.target },
           _react2.default.createElement(
             _reactBootstrap.Tooltip,
             { id: 'tooltip', className: 'in', style: { pointerEvents: 'none' } },
@@ -73682,11 +73682,11 @@ var Hovers = function (_Component) {
     }
   }, {
     key: 'mouseOverHundler',
-    value: function mouseOverHundler(date, index) {
+    value: function mouseOverHundler(date, index, placement) {
       var _this3 = this;
 
       return function () {
-        _this3.props.setTooltip(true, _this3.rectRefs[index], _this3.getTooltipData(date));
+        _this3.props.setTooltip(true, _this3.rectRefs[index], _this3.getTooltipData(date), placement);
         _this3.props.setHoverDate(date);
       };
     }
@@ -73706,9 +73706,10 @@ var Hovers = function (_Component) {
 
       var x = d3.scaleTime().range([0, width]).domain(domainX);
 
-      var len = data.length;
-
       return data.map(function (stock, index) {
+        var nextStock = index < data.length - 1 ? data[index + 1] : null;
+        var nextX = nextStock ? x(nextStock.date) : width;
+        var placement = index < data.length / 2 ? 'right' : 'left';
         return _react2.default.createElement(
           'g',
           { key: stock.date },
@@ -73716,10 +73717,10 @@ var Hovers = function (_Component) {
           _react2.default.createElement('rect', {
             x: x(stock.date),
             y: 0,
-            width: width,
+            width: nextX - x(stock.date),
             height: height,
-            opacity: '0.0',
-            onMouseOver: _this4.mouseOverHundler(stock.date, index),
+            opacity: '0.1',
+            onMouseOver: _this4.mouseOverHundler(stock.date, index, placement),
             onMouseOut: _this4.mouseOutHundler(stock.date, index),
             ref: function ref(_ref3) {
               return _this4.rectRefs[index] = _ref3;
@@ -74417,9 +74418,10 @@ var tooltip = function tooltip() {
       var _action$tooltip = action.tooltip,
           show = _action$tooltip.show,
           target = _action$tooltip.target,
-          data = _action$tooltip.data;
+          data = _action$tooltip.data,
+          placement = _action$tooltip.placement;
 
-      return { show: show, target: target, data: data };
+      return { show: show, target: target, data: data, placement: placement };
     default:
       return state;
   }

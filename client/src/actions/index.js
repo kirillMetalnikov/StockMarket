@@ -54,8 +54,8 @@ export const setHoverDate = date => dispatch => {
   dispatch({type: SET_ACTIVE_DATE, date})
 }
 
-export const setTooltip = (show, target, data, activeDate) => dispatch => {
-  dispatch({type: SET_TOOLTIP, tooltip: {show, target, data}})
+export const setTooltip = (show, target, data, placement) => dispatch => {
+  dispatch({type: SET_TOOLTIP, tooltip: {show, target, data, placement}})
 }
 
 export const setActiveButton = (e) => dispatch => {

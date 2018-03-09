@@ -42,9 +42,9 @@ class Hovers extends Component {
     )
   }
 
-  mouseOverHundler(date, index) {
+  mouseOverHundler(date, index, placement) {
     return () => {
-      this.props.setTooltip(true, this.rectRefs[index], this.getTooltipData(date))
+      this.props.setTooltip(true, this.rectRefs[index], this.getTooltipData(date), placement)
       this.props.setHoverDate(date)
     }
   }
@@ -57,10 +57,11 @@ class Hovers extends Component {
       .range([0, width])
       .domain(domainX)
 
-    var len = data.length
-
     return (
       data.map( (stock, index) => {
+        var nextStock = index < data.length - 1 ? data[index + 1]: null
+        var nextX = nextStock ? x(nextStock.date) : width
+        var placement = index < data.length / 2 ? 'right' : 'left'
         return (
           <g  key = {stock.date}>
             {(activeDate && (stock.date.getTime() == activeDate.getTime()))
@@ -70,10 +71,10 @@ class Hovers extends Component {
             <rect
               x = {x(stock.date)}
               y = {0}
-              width = {width}
+              width = {nextX - x(stock.date)}
               height = {height}
-              opacity = '0.0'
-              onMouseOver = {this.mouseOverHundler(stock.date, index)}
+              opacity = '0.1'
+              onMouseOver = {this.mouseOverHundler(stock.date, index, placement)}
               onMouseOut = {this.mouseOutHundler(stock.date, index)}
               ref = {ref => this.rectRefs[index] = ref}
             />
