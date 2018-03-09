@@ -41,14 +41,16 @@ class AddStockForm extends Component {
             Syncs in realtime
           </div>
           <div style = {{margin: 5}}>
-            <FormGroup>
-              <InputGroup>
-                <FormControl type="text"  onChange = {this.hundleChange.bind(this)} value = {this.state.inputValue}/>
-                <InputGroup.Button>
-                  <Button onClick = { this.hundleSubmin.bind(this) }>Add</Button>
-                </InputGroup.Button>
-              </InputGroup>
-            </FormGroup>
+            <form  onSubmit = { this.hundleSubmin.bind(this) } >
+              <FormGroup>
+                <InputGroup>
+                  <FormControl type="text"  onChange = {this.hundleChange.bind(this)} value = {this.state.inputValue} />
+                  <InputGroup.Button>
+                    <Button type="submit">Add</Button>
+                  </InputGroup.Button>
+                </InputGroup>
+              </FormGroup>
+            </form>
           </div>
         </div>
       </Col>

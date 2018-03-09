@@ -73937,19 +73937,23 @@ var AddStockForm = function (_Component) {
             'div',
             { style: { margin: 5 } },
             _react2.default.createElement(
-              _reactBootstrap.FormGroup,
-              null,
+              'form',
+              { onSubmit: this.hundleSubmin.bind(this) },
               _react2.default.createElement(
-                _reactBootstrap.InputGroup,
+                _reactBootstrap.FormGroup,
                 null,
-                _react2.default.createElement(_reactBootstrap.FormControl, { type: 'text', onChange: this.hundleChange.bind(this), value: this.state.inputValue }),
                 _react2.default.createElement(
-                  _reactBootstrap.InputGroup.Button,
+                  _reactBootstrap.InputGroup,
                   null,
+                  _react2.default.createElement(_reactBootstrap.FormControl, { type: 'text', onChange: this.hundleChange.bind(this), value: this.state.inputValue }),
                   _react2.default.createElement(
-                    _reactBootstrap.Button,
-                    { onClick: this.hundleSubmin.bind(this) },
-                    'Add'
+                    _reactBootstrap.InputGroup.Button,
+                    null,
+                    _react2.default.createElement(
+                      _reactBootstrap.Button,
+                      { type: 'submit' },
+                      'Add'
+                    )
                   )
                 )
               )

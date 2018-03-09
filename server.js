@@ -26,6 +26,7 @@ const getStock = (symbol, from, to) => {
 }
 
 const getFullName = ({stock, symbol}) => {
+  if(stock.length == 0) return {stock, exchangeName: '', longName: ''}
   return new Promise( (resolve, reject) => {
     yahooFinance.quote({
         symbol,
