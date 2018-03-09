@@ -1,12 +1,13 @@
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
-import {setDisplayPeriod} from '../actions'
+import {setDisplayPeriod, setActiveButton} from '../actions'
 import {ButtonToolbar, ToggleButton, ToggleButtonGroup} from 'react-bootstrap'
 
 class ControlDatePanel extends Component {
   constructor(props) {
     super(props)
     this.onClickHundler = this.onClickHundler.bind(this)
+    this.state = {value: -1}
   }
 
   onClickHundler(from, to) {
@@ -14,7 +15,7 @@ class ControlDatePanel extends Component {
       this.props.setDisplayPeriod(from, to)
     }
   }
-  
+
   render() {
     var {from, to} = this.props.stock.stockPeriod
     var from6Month = new Date()
@@ -31,9 +32,9 @@ class ControlDatePanel extends Component {
 
     return (
       <ButtonToolbar>
-        <ToggleButtonGroup type="radio" name="options"  bsSize="small" defaultValue={1}>
+        <ToggleButtonGroup type="radio" name="options"  bsSize="small" value={this.props.activeButton} onChange = {this.props.setActiveButton} >
           <ToggleButton onClick = { this.onClickHundler(from, to) } value={1}>All</ToggleButton>
-          <ToggleButton onClick = { this.onClickHundler(from6Month, to)} value={2} >6 Month</ToggleButton>
+          <ToggleButton onClick = { this.onClickHundler(from6Month, to)} value={2}>6 Month</ToggleButton>
           <ToggleButton onClick = { this.onClickHundler(from3Month, to)} value={3}>3 Month</ToggleButton>
           <ToggleButton onClick = { this.onClickHundler(fromMonth, to)} value={4}>Month</ToggleButton>
         </ToggleButtonGroup>
@@ -42,7 +43,7 @@ class ControlDatePanel extends Component {
   }
 }
 
-const mapStateToProps = ({stock}) => {
-  return {stock};
+const mapStateToProps = ({stock, activeButton}) => {
+  return {stock, activeButton};
 }
-export default connect(mapStateToProps, {setDisplayPeriod})(ControlDatePanel)
+export default connect(mapStateToProps, {setDisplayPeriod, setActiveButton})(ControlDatePanel)

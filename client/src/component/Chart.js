@@ -8,7 +8,6 @@ import Lines from './Lines'
 import AxisDate from './AxisDate'
 import AxisBrush from './AxisBrush'
 import AxisPrice from './AxisPrice'
-import ActiveMarkers from './ActiveMarkers'
 import Hovers from './Hovers'
 import {setHoverDate, setTooltip} from '../actions'
 
@@ -17,8 +16,16 @@ class Chart extends Component {
     super(props)
   }
 
+  renderTooltip(data){
+    return data.map(({code, close, color}) => {
+      return (
+        <span key = {code} style = {{color}}>{code}: {close}<br/></span>
+      )
+    })
+  }
+
   render() {
-    var { width, height, stock, priceDomain, activeCode, tooltip} = this.props
+    var { width, height, stock, priceDomain, activeCode, tooltip, activeDate} = this.props
     var {displayPeriod, priceDomain, stockPeriod, displayStocks, stocks} = stock
 
     var marginV = 30
@@ -38,7 +45,7 @@ class Chart extends Component {
                 stocks = {displayStocks}
                 activeCode ={activeCode}
               />
-              <ActiveMarkers width = {width} height = {height - 50}/>
+
               <Hovers width = {width} height ={height - 50}/>
             </g>
             <g  transform = {`translate(0, ${height - 50})`}>
@@ -61,9 +68,9 @@ class Chart extends Component {
         {
           tooltip.target ?
             (<Overlay container = {this} placement="left" show = {tooltip.show} target = {tooltip.target}>
-              <Tooltip id = "tooltip" className="in" style = { {pointerEvents: 'none'}}>{tooltip.text}</Tooltip>
+              <Tooltip id = "tooltip" className="in" style = { {pointerEvents: 'none'}}><h6>{activeDate.toString()}</h6>{this.renderTooltip(tooltip.data)}</Tooltip>
             </Overlay>):
-            null 
+            null
         }
 
       </div>

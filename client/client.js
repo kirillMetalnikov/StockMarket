@@ -3411,7 +3411,7 @@ var slice = array.slice;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setTooltip = exports.setHoverDate = exports.setActive = exports.setDisplayPeriod = exports.deleteStock = exports.getStock = exports.socketListener = undefined;
+exports.setActiveButton = exports.setTooltip = exports.setHoverDate = exports.setActive = exports.setDisplayPeriod = exports.deleteStock = exports.getStock = exports.socketListener = undefined;
 
 var _axios = __webpack_require__(834);
 
@@ -3468,6 +3468,13 @@ var deleteStock = exports.deleteStock = function deleteStock(code) {
 var setDisplayPeriod = exports.setDisplayPeriod = function setDisplayPeriod(from, to) {
   return function (dispatch) {
     dispatch({ type: _const.SET_DISPLAY_PERIOD, from: from, to: to });
+
+    var timeDif = to.getTime() - from.getTime();
+    var diffMonth = Math.round(timeDif / (1000 * 3600 * 24 * 30));
+
+    if (diffMonth != 1 && diffMonth != 3 && diffMonth != 6 && diffMonth != 12) {
+      dispatch({ type: _const.SET_ACTIVE_BUTTON, active: -1 });
+    }
   };
 };
 
@@ -3483,10 +3490,15 @@ var setHoverDate = exports.setHoverDate = function setHoverDate(date) {
   };
 };
 
-var setTooltip = exports.setTooltip = function setTooltip(show, target, text) {
+var setTooltip = exports.setTooltip = function setTooltip(show, target, data, activeDate) {
   return function (dispatch) {
-    text = text && text.toString();
-    dispatch({ type: _const.SET_TOOLTIP, tooltip: { show: show, target: target, text: text } });
+    dispatch({ type: _const.SET_TOOLTIP, tooltip: { show: show, target: target, data: data } });
+  };
+};
+
+var setActiveButton = exports.setActiveButton = function setActiveButton(e) {
+  return function (dispatch) {
+    dispatch({ type: _const.SET_ACTIVE_BUTTON, active: e });
   };
 };
 
@@ -24465,6 +24477,7 @@ var SET_ACTIVE = exports.SET_ACTIVE = 'SET_ACTIVE';
 var DELETE_STOCK = exports.DELETE_STOCK = 'DELETE_STOCK';
 var SET_ACTIVE_DATE = exports.SET_ACTIVE_DATE = 'SET_ACTIVE_DATE';
 var SET_TOOLTIP = exports.SET_TOOLTIP = 'SET_TOOLTIP';
+var SET_ACTIVE_BUTTON = exports.SET_ACTIVE_BUTTON = 'SET_ACTIVE_BUTTON';
 
 /***/ }),
 /* 356 */
@@ -43712,7 +43725,7 @@ var App = function (_Component) {
             { ref: function ref(_ref) {
                 return _this2.well = _ref;
               } },
-            _react2.default.createElement(_ControlDatePanel2.default, null),
+            _react2.default.createElement(_ControlDatePanel2.default, { active: this.state.activeButton }),
             _react2.default.createElement(_Chart2.default, { width: this.state.clientWidth, height: 350 })
           )
         ),
@@ -55231,11 +55244,7 @@ var _AxisPrice = __webpack_require__(881);
 
 var _AxisPrice2 = _interopRequireDefault(_AxisPrice);
 
-var _ActiveMarkers = __webpack_require__(882);
-
-var _ActiveMarkers2 = _interopRequireDefault(_ActiveMarkers);
-
-var _Hovers = __webpack_require__(883);
+var _Hovers = __webpack_require__(882);
 
 var _Hovers2 = _interopRequireDefault(_Hovers);
 
@@ -55261,6 +55270,24 @@ var Chart = function (_Component) {
   }
 
   _createClass(Chart, [{
+    key: 'renderTooltip',
+    value: function renderTooltip(data) {
+      return data.map(function (_ref) {
+        var code = _ref.code,
+            close = _ref.close,
+            color = _ref.color;
+
+        return _react2.default.createElement(
+          'span',
+          { key: code, style: { color: color } },
+          code,
+          ': ',
+          close,
+          _react2.default.createElement('br', null)
+        );
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _props = this.props,
@@ -55269,7 +55296,8 @@ var Chart = function (_Component) {
           stock = _props.stock,
           priceDomain = _props.priceDomain,
           activeCode = _props.activeCode,
-          tooltip = _props.tooltip;
+          tooltip = _props.tooltip,
+          activeDate = _props.activeDate;
       var displayPeriod = stock.displayPeriod,
           priceDomain = stock.priceDomain,
           stockPeriod = stock.stockPeriod,
@@ -55301,7 +55329,6 @@ var Chart = function (_Component) {
                 stocks: displayStocks,
                 activeCode: activeCode
               }),
-              _react2.default.createElement(_ActiveMarkers2.default, { width: width, height: height - 50 }),
               _react2.default.createElement(_Hovers2.default, { width: width, height: height - 50 })
             ),
             _react2.default.createElement(
@@ -55331,7 +55358,12 @@ var Chart = function (_Component) {
           _react2.default.createElement(
             _reactBootstrap.Tooltip,
             { id: 'tooltip', className: 'in', style: { pointerEvents: 'none' } },
-            tooltip.text
+            _react2.default.createElement(
+              'h6',
+              null,
+              activeDate.toString()
+            ),
+            this.renderTooltip(tooltip.data)
           )
         ) : null
       );
@@ -73579,118 +73611,11 @@ var _d = __webpack_require__(28);
 
 var d3 = _interopRequireWildcard(_d);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ActiveMarkers = function (_Component) {
-  _inherits(ActiveMarkers, _Component);
-
-  function ActiveMarkers(props) {
-    _classCallCheck(this, ActiveMarkers);
-
-    return _possibleConstructorReturn(this, (ActiveMarkers.__proto__ || Object.getPrototypeOf(ActiveMarkers)).call(this, props));
-  }
-
-  _createClass(ActiveMarkers, [{
-    key: 'render',
-    value: function render() {
-      var _props = this.props,
-          width = _props.width,
-          height = _props.height,
-          data = _props.data,
-          domainX = _props.domainX,
-          domainY = _props.domainY,
-          activeDate = _props.activeDate;
-
-      if (!activeDate) {
-        return null;
-      }
-      //    console.log(data)
-      var color = d3.schemeCategory20;
-
-      var x = d3.scaleTime().rangeRound([0, width]).domain(domainX);
-      var y = d3.scaleLinear().range([height, 0]).domain(domainY);
-
-      return _react2.default.createElement(
-        'g',
-        null,
-        _react2.default.createElement('line', {
-          className: 'marker',
-          x1: x(activeDate),
-          y1: 0,
-          x2: x(activeDate),
-          y2: height,
-          strokeWidth: 4,
-          stroke: 'gray'
-        }),
-        data.map(function (_ref, index) {
-          var _React$createElement;
-
-          var stock = _ref.stock,
-              code = _ref.code;
-
-          var _stock$find = stock.find(function (_ref2) {
-            var date = _ref2.date;
-
-            return date.getTime() == activeDate.getTime();
-          }),
-              close = _stock$find.close;
-
-          if (!close) return;
-          return _react2.default.createElement('circle', (_React$createElement = { key: index
-          }, _defineProperty(_React$createElement, 'key', code), _defineProperty(_React$createElement, 'r', 3), _defineProperty(_React$createElement, 'cx', x(activeDate)), _defineProperty(_React$createElement, 'cy', y(+close)), _defineProperty(_React$createElement, 'fill', color[index]), _React$createElement));
-        })
-      );
-    }
-  }]);
-
-  return ActiveMarkers;
-}(_react.Component);
-
-var mapStateToProps = function mapStateToProps(_ref3) {
-  var activeDate = _ref3.activeDate,
-      stock = _ref3.stock;
-  var displayPeriod = stock.displayPeriod,
-      priceDomain = stock.priceDomain,
-      displayStocks = stock.displayStocks;
-
-  return { activeDate: activeDate, data: displayStocks, domainX: [displayPeriod.from, displayPeriod.to], domainY: [priceDomain.from, priceDomain.to] };
-};
-exports.default = (0, _reactRedux.connect)(mapStateToProps)(ActiveMarkers);
-
-/***/ }),
-/* 883 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactRedux = __webpack_require__(31);
-
-var _d = __webpack_require__(28);
-
-var d3 = _interopRequireWildcard(_d);
-
 var _actions = __webpack_require__(48);
+
+var _ActiveMarkers = __webpack_require__(883);
+
+var _ActiveMarkers2 = _interopRequireDefault(_ActiveMarkers);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -73727,12 +73652,41 @@ var Hovers = function (_Component) {
       };
     }
   }, {
+    key: 'getTooltipData',
+    value: function getTooltipData(activeDate) {
+      var _props = this.props,
+          width = _props.width,
+          height = _props.height,
+          domainX = _props.domainX,
+          domainY = _props.domainY,
+          displayStocks = _props.displayStocks;
+
+      var color = d3.schemeCategory20;
+
+      var x = d3.scaleTime().rangeRound([0, width]).domain(domainX);
+      var y = d3.scaleLinear().range([height, 0]).domain(domainY);
+
+      return displayStocks.map(function (_ref, index) {
+        var stock = _ref.stock,
+            code = _ref.code;
+
+        var _stock$find = stock.find(function (_ref2) {
+          var date = _ref2.date;
+
+          return date.getTime() == activeDate.getTime();
+        }),
+            close = _stock$find.close;
+
+        return { code: code, close: close, color: color[index] };
+      });
+    }
+  }, {
     key: 'mouseOverHundler',
     value: function mouseOverHundler(date, index) {
       var _this3 = this;
 
       return function () {
-        _this3.props.setTooltip(true, _this3.rectRefs[index], date);
+        _this3.props.setTooltip(true, _this3.rectRefs[index], _this3.getTooltipData(date));
         _this3.props.setHoverDate(date);
       };
     }
@@ -73741,33 +73695,37 @@ var Hovers = function (_Component) {
     value: function render() {
       var _this4 = this;
 
-      var _props = this.props,
-          width = _props.width,
-          height = _props.height,
-          domainX = _props.domainX,
-          displayStocks = _props.displayStocks;
-      //    console.log(displayStocks)
+      var _props2 = this.props,
+          width = _props2.width,
+          height = _props2.height,
+          domainX = _props2.domainX,
+          displayStocks = _props2.displayStocks,
+          activeDate = _props2.activeDate;
 
       var data = displayStocks.length ? displayStocks[0].stock : [];
 
       var x = d3.scaleTime().range([0, width]).domain(domainX);
 
       var len = data.length;
+
       return data.map(function (stock, index) {
-        return _react2.default.createElement('rect', {
-          className: 'hover',
-          key: stock.date,
-          x: x(stock.date),
-          y: 0,
-          width: width,
-          height: height,
-          opacity: '0.0',
-          onMouseOver: _this4.mouseOverHundler(stock.date, index),
-          onMouseOut: _this4.mouseOutHundler(stock.date, index),
-          ref: function ref(_ref) {
-            return _this4.rectRefs[index] = _ref;
-          }
-        });
+        return _react2.default.createElement(
+          'g',
+          { key: stock.date },
+          activeDate && stock.date.getTime() == activeDate.getTime() ? _react2.default.createElement(_ActiveMarkers2.default, { width: width, height: height, activeDate: stock.date }) : null,
+          _react2.default.createElement('rect', {
+            x: x(stock.date),
+            y: 0,
+            width: width,
+            height: height,
+            opacity: '0.0',
+            onMouseOver: _this4.mouseOverHundler(stock.date, index),
+            onMouseOut: _this4.mouseOutHundler(stock.date, index),
+            ref: function ref(_ref3) {
+              return _this4.rectRefs[index] = _ref3;
+            }
+          })
+        );
       });
     }
   }]);
@@ -73775,14 +73733,124 @@ var Hovers = function (_Component) {
   return Hovers;
 }(_react.Component);
 
-var mapStateToProps = function mapStateToProps(_ref2) {
-  var stock = _ref2.stock;
+var mapStateToProps = function mapStateToProps(_ref4) {
+  var stock = _ref4.stock,
+      activeDate = _ref4.activeDate;
   var displayPeriod = stock.displayPeriod,
-      displayStocks = stock.displayStocks;
+      displayStocks = stock.displayStocks,
+      priceDomain = stock.priceDomain;
 
-  return { domainX: [displayPeriod.from, displayPeriod.to], displayStocks: displayStocks };
+  return { domainX: [displayPeriod.from, displayPeriod.to], displayStocks: displayStocks, domainY: [priceDomain.from, priceDomain.to], activeDate: activeDate };
 };
 exports.default = (0, _reactRedux.connect)(mapStateToProps, { setHoverDate: _actions.setHoverDate, setTooltip: _actions.setTooltip })(Hovers);
+
+/***/ }),
+/* 883 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRedux = __webpack_require__(31);
+
+var _d = __webpack_require__(28);
+
+var d3 = _interopRequireWildcard(_d);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ActiveMarkers = function (_Component) {
+  _inherits(ActiveMarkers, _Component);
+
+  function ActiveMarkers(props) {
+    _classCallCheck(this, ActiveMarkers);
+
+    return _possibleConstructorReturn(this, (ActiveMarkers.__proto__ || Object.getPrototypeOf(ActiveMarkers)).call(this, props));
+  }
+
+  _createClass(ActiveMarkers, [{
+    key: 'render',
+    value: function render() {
+      var _props = this.props,
+          width = _props.width,
+          height = _props.height,
+          domainX = _props.domainX,
+          displayStocks = _props.displayStocks,
+          domainY = _props.domainY,
+          activeDate = _props.activeDate;
+
+
+      if (!activeDate) return null;
+      var color = d3.schemeCategory20;
+
+      var x = d3.scaleTime().rangeRound([0, width]).domain(domainX);
+      var y = d3.scaleLinear().range([height, 0]).domain(domainY);
+      //this.props.setTooltip(true, this.rectRefs[index], `huy: ${activeDate}`)
+      return _react2.default.createElement(
+        'g',
+        null,
+        _react2.default.createElement('line', {
+          className: 'marker',
+          x1: x(activeDate),
+          y1: 0,
+          x2: x(activeDate),
+          y2: height,
+          strokeWidth: 4,
+          stroke: 'gray'
+        }),
+        displayStocks.map(function (_ref, index) {
+          var _React$createElement;
+
+          var stock = _ref.stock,
+              code = _ref.code;
+
+          var _stock$find = stock.find(function (_ref2) {
+            var date = _ref2.date;
+
+            return date.getTime() == activeDate.getTime();
+          }),
+              close = _stock$find.close;
+
+          if (!close) return;
+          return _react2.default.createElement('circle', (_React$createElement = { key: index
+          }, _defineProperty(_React$createElement, 'key', code), _defineProperty(_React$createElement, 'r', 3), _defineProperty(_React$createElement, 'cx', x(activeDate)), _defineProperty(_React$createElement, 'cy', y(+close)), _defineProperty(_React$createElement, 'fill', color[index]), _React$createElement));
+        })
+      );
+    }
+  }]);
+
+  return ActiveMarkers;
+}(_react.Component);
+
+var mapStateToProps = function mapStateToProps(_ref3) {
+  var stock = _ref3.stock;
+  var displayPeriod = stock.displayPeriod,
+      priceDomain = stock.priceDomain,
+      displayStocks = stock.displayStocks;
+
+  return { displayStocks: displayStocks, domainX: [displayPeriod.from, displayPeriod.to], domainY: [priceDomain.from, priceDomain.to] };
+};
+exports.default = (0, _reactRedux.connect)(mapStateToProps)(ActiveMarkers);
 
 /***/ }),
 /* 884 */
@@ -73942,6 +74010,7 @@ var ControlDatePanel = function (_Component) {
     var _this = _possibleConstructorReturn(this, (ControlDatePanel.__proto__ || Object.getPrototypeOf(ControlDatePanel)).call(this, props));
 
     _this.onClickHundler = _this.onClickHundler.bind(_this);
+    _this.state = { value: -1 };
     return _this;
   }
 
@@ -73978,7 +74047,7 @@ var ControlDatePanel = function (_Component) {
         null,
         _react2.default.createElement(
           _reactBootstrap.ToggleButtonGroup,
-          { type: 'radio', name: 'options', bsSize: 'small', defaultValue: 1 },
+          { type: 'radio', name: 'options', bsSize: 'small', value: this.props.activeButton, onChange: this.props.setActiveButton },
           _react2.default.createElement(
             _reactBootstrap.ToggleButton,
             { onClick: this.onClickHundler(from, to), value: 1 },
@@ -74008,11 +74077,12 @@ var ControlDatePanel = function (_Component) {
 }(_react.Component);
 
 var mapStateToProps = function mapStateToProps(_ref) {
-  var stock = _ref.stock;
+  var stock = _ref.stock,
+      activeButton = _ref.activeButton;
 
-  return { stock: stock };
+  return { stock: stock, activeButton: activeButton };
 };
-exports.default = (0, _reactRedux.connect)(mapStateToProps, { setDisplayPeriod: _actions.setDisplayPeriod })(ControlDatePanel);
+exports.default = (0, _reactRedux.connect)(mapStateToProps, { setDisplayPeriod: _actions.setDisplayPeriod, setActiveButton: _actions.setActiveButton })(ControlDatePanel);
 
 /***/ }),
 /* 886 */
@@ -74237,7 +74307,7 @@ var priceDomain = function priceDomain() {
 };
 
 var from = new Date();
-from.setFullYear(from.getFullYear() - 3);
+from.setFullYear(from.getFullYear() - 1);
 var to = new Date();
 
 var initialStock = {
@@ -74347,19 +74417,31 @@ var tooltip = function tooltip() {
       var _action$tooltip = action.tooltip,
           show = _action$tooltip.show,
           target = _action$tooltip.target,
-          text = _action$tooltip.text;
+          data = _action$tooltip.data;
 
-      return { show: show, target: target, text: text };
+      return { show: show, target: target, data: data };
     default:
       return state;
   }
 };
 
+var activeButton = function activeButton() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+  var action = arguments[1];
+
+  switch (action.type) {
+    case _const.SET_ACTIVE_BUTTON:
+      return action.active;
+    default:
+      return state;
+  }
+};
 exports.default = (0, _redux.combineReducers)({
   stock: stock,
   activeCode: activeCode,
   activeDate: activeDate,
-  tooltip: tooltip
+  tooltip: tooltip,
+  activeButton: activeButton
 });
 
 /***/ })

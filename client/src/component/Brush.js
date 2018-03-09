@@ -23,6 +23,7 @@ class Brush extends Component {
         .extent([[0, 0], [width, height]])
         .on("end", this.brushed)
 
+
     var startX = this.x(brushFrom)
     var endX = this.x(brushTo)
 

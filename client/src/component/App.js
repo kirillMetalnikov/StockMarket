@@ -33,7 +33,7 @@ class App extends Component {
           <PageHeader>Watch stocks</PageHeader>
           <Well>
             <div ref = {ref => this.well = ref}>
-              <ControlDatePanel />
+              <ControlDatePanel active = {this.state.activeButton}/>
               <Chart width={this.state.clientWidth} height={350}/>
             </div>
           </Well>

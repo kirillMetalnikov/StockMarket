@@ -8,11 +8,9 @@ class ActiveMarkers extends Component {
   }
 
   render() {
-    var {width, height, data, domainX, domainY, activeDate} = this.props
-    if (!activeDate) {
-      return null
-    }
-//    console.log(data)
+    var {width, height, domainX, displayStocks, domainY, activeDate} = this.props
+
+    if (!activeDate) return null
     let color = d3.schemeCategory20
 
     var x = d3.scaleTime()
@@ -21,7 +19,7 @@ class ActiveMarkers extends Component {
     var y = d3.scaleLinear()
       .range([height, 0])
       .domain(domainY)
-
+    //this.props.setTooltip(true, this.rectRefs[index], `huy: ${activeDate}`)
     return (
       <g>
         <line
@@ -33,7 +31,7 @@ class ActiveMarkers extends Component {
           strokeWidth = {4}
           stroke = 'gray'
         />
-        {data.map( ({stock, code}, index) => {
+        {displayStocks.map( ({stock, code}, index) => {
           var {close} = stock.find( ({date}) => {
             return date.getTime() == activeDate.getTime()
           })
@@ -53,8 +51,8 @@ class ActiveMarkers extends Component {
   }
 }
 
-const mapStateToProps = ({activeDate, stock}) => {
+const mapStateToProps = ({stock}) => {
   var {displayPeriod, priceDomain, displayStocks} = stock
-  return {activeDate, data: displayStocks, domainX: [displayPeriod.from, displayPeriod.to], domainY: [priceDomain.from, priceDomain.to]}
+  return {displayStocks, domainX: [displayPeriod.from, displayPeriod.to], domainY: [priceDomain.from, priceDomain.to]}
 }
 export default connect(mapStateToProps)(ActiveMarkers)
